@@ -196,37 +196,13 @@ export function ResultsState({
           </div>
         )}
 
-        {/* Download and Share Buttons */}
-        <div className="flex items-center gap-2 mb-4">
+        {/* Download Button */}
+        <div className="mb-4">
           <Button 
-            className="flex-grow bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-4 px-4 rounded-md font-medium transition-colors flex items-center justify-center text-lg shadow-md"
+            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-4 px-4 rounded-md font-medium transition-colors flex items-center justify-center text-lg shadow-md"
             onClick={onDownload}
           >
             <FAIcon icon="download" className="mr-2 text-xl" /> Download Now
-          </Button>
-          
-          <Button 
-            variant="outline"
-            size="sm"
-            className="border-primary text-primary hover:bg-primary/10"
-            onClick={() => {
-              if (navigator.share) {
-                navigator.share({
-                  title: `${videoData.title} by @${videoData.author}`,
-                  text: "Check out this TikTok video I found with SamaBrains TikTok Downloader!",
-                  url: videoData.url,
-                });
-              } else {
-                window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(`${videoData.title} by @${videoData.author}`)}&url=${encodeURIComponent(videoData.url)}`, '_blank');
-              }
-            }}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
-              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
-              <polyline points="16 6 12 2 8 6"></polyline>
-              <line x1="12" y1="2" x2="12" y2="15"></line>
-            </svg>
-            Share
           </Button>
         </div>
         

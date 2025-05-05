@@ -209,35 +209,14 @@ export function DownloadHistorySection() {
                   </div>
                 </div>
                 
-                <div className="flex gap-2 mt-3">
-                  <Button 
-                    variant="default" 
-                    className="flex-grow text-xs sm:text-sm py-1 h-8"
-                    onClick={() => handleRedownload(download)}
-                  >
-                    <ArrowDown size={14} className="mr-1 sm:mr-2" />
-                    Download
-                  </Button>
-                  
-                  <Button 
-                    variant="outline"
-                    size="sm"
-                    className="border-primary text-primary hover:bg-primary/10 h-8 px-2"
-                    onClick={() => {
-                      if (navigator.share) {
-                        navigator.share({
-                          title: `${download.title} by @${download.author}`,
-                          text: "Check out this TikTok video I found with SamaBrains TikTok Downloader!",
-                          url: download.videoUrl,
-                        }).catch(err => console.error('Sharing failed', err));
-                      } else {
-                        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(`${download.title} by @${download.author}`)}&url=${encodeURIComponent(download.videoUrl)}`, '_blank');
-                      }
-                    }}
-                  >
-                    <Share2 size={14} />
-                  </Button>
-                </div>
+                <Button 
+                  variant="default" 
+                  className="w-full mt-3 text-xs sm:text-sm py-1 h-8"
+                  onClick={() => handleRedownload(download)}
+                >
+                  <ArrowDown size={14} className="mr-1 sm:mr-2" />
+                  Download Again
+                </Button>
               </div>
             </Card>
           ))}
