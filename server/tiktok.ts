@@ -393,7 +393,7 @@ export function cleanupTempFiles() {
     
     let deletedCount = 0;
     
-    files.forEach(file => {
+    files.forEach((file: string) => {
       try {
         const filePath = path.join(TMP_DIR, file);
         const stats = fs.statSync(filePath);
@@ -411,11 +411,11 @@ export function cleanupTempFiles() {
             if (videoCache.has(videoId)) {
               const formatCache = videoCache.get(videoId)!;
               // Find and remove any cache entries for this file
-              for (const [key, value] of formatCache.entries()) {
+              formatCache.forEach((value, key) => {
                 if (value.filePath === filePath) {
                   formatCache.delete(key);
                 }
-              }
+              });
               
               // Remove the entire video entry if no formats are left
               if (formatCache.size === 0) {

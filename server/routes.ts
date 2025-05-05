@@ -91,21 +91,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
       
-      // Schedule file for cleanup after streaming is complete
-      fileStream.on("close", () => {
-        // In a production environment, files would be cleaned up periodically
-        // This is a simplified approach
-        try {
-          // Don't delete immediately to allow for potential retries
-          setTimeout(() => {
-            if (fs.existsSync(filePath)) {
-              fs.unlinkSync(filePath);
-            }
-          }, 60000); // Delete after 1 minute
-        } catch (error) {
-          console.error("Error cleaning up file:", error);
-        }
-      });
+      // Files will be cleaned up by the scheduled cleanup process
+      // No need to delete immediately after streaming
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ 

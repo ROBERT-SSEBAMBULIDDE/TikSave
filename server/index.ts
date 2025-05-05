@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { cleanupTempFiles } from "./tiktok";
 
 const app = express();
 app.use(express.json());
@@ -66,5 +67,17 @@ app.use((req, res, next) => {
     reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
+    
+    // Run initial cleanup
+    cleanupTempFiles();
+    
+    // Schedule cleanup to run every hour
+    setInterval(() => {
+      try {
+        cleanupTempFiles();
+      } catch (err) {
+        console.error('Scheduled cleanup error:', err);
+      }
+    }, 60 * 60 * 1000); // 1 hour
   });
 })();
