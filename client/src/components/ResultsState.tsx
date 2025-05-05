@@ -26,13 +26,14 @@ export function ResultsState({
 
   // Handle play/pause
   const handlePreviewToggle = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
+    if (isPlaying) {
+      if (videoRef.current) {
         videoRef.current.pause();
-      } else {
-        videoRef.current.play();
       }
-      setIsPlaying(!isPlaying);
+      setIsPlaying(false);
+    } else {
+      setIsPlaying(true);
+      // When setting to playing, the video will load with autoPlay
     }
   };
 

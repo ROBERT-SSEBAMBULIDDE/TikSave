@@ -175,7 +175,7 @@ export function VideoPlayer({ videoData, quality }: VideoPlayerProps) {
       <video
         ref={videoRef}
         className="w-full h-full object-contain"
-        src={`/api/tiktok/download?videoId=${videoData.id}&format=mp4&quality=${quality}`}
+        src={`/api/tiktok/download?videoId=${videoData.id}&format=mp4&quality=${quality}&videoUrl=${encodeURIComponent(videoData.url)}&thumbnailUrl=${encodeURIComponent(videoData.thumbnailUrl)}&title=${encodeURIComponent(videoData.title)}&author=${encodeURIComponent(videoData.author)}`}
         onClick={togglePlayPause}
         playsInline
       />
