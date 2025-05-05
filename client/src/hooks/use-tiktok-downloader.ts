@@ -212,11 +212,11 @@ export function useTikTokDownloader() {
           
           // Add download to session history
           try {
-            // Import here to avoid circular dependency
-            const { saveDownloadToHistory } = await import('@/components/DownloadHistorySection');
+            // Get saveToSessionHistory function
+            const { saveToSessionHistory } = await import('@/components/DownloadHistorySection');
             
             // Save download to session history
-            saveDownloadToHistory({
+            saveToSessionHistory({
               videoId: downloadOptions.videoId,
               videoUrl: videoData.url,
               thumbnailUrl: videoData.thumbnailUrl,

@@ -4,9 +4,9 @@ import { formatBytes } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ArrowDown, Clock, Film, Music, RefreshCw, Trash2 } from 'lucide-react';
 
-// Define interface for download records stored in session storage
+// Define interface for download records
 interface DownloadRecord {
-  id: string; // Using timestamp as unique ID
+  id: string;
   videoId: string;
   videoUrl: string;
   thumbnailUrl: string;
@@ -18,40 +18,28 @@ interface DownloadRecord {
   downloadedAt: string;
 }
 
-// Session storage key
+// Constants
 const SESSION_STORAGE_KEY = 'tiktok_downloader_history';
 
-// Function to get session downloads
-const getSessionDownloads = (): DownloadRecord[] => {
+// Helper to save download history
+export function saveToSessionHistory(download: Omit<DownloadRecord, 'id' | 'downloadedAt'>) {
   try {
-    const stored = sessionStorage.getItem(SESSION_STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch (err) {
-    console.error('Error reading from session storage:', err);
-    return [];
-  }
-};
-
-// Function to save downloads to session storage
-export const saveDownloadToHistory = (download: Omit<DownloadRecord, 'id' | 'downloadedAt'>) => {
-  try {
-    // Get existing downloads
-    const existing = getSessionDownloads();
+    // Get current downloads
+    const existingJSON = sessionStorage.getItem(SESSION_STORAGE_KEY);
+    const existing: DownloadRecord[] = existingJSON ? JSON.parse(existingJSON) : [];
     
-    // Create new download record with ID and timestamp
+    // Create new record
     const newDownload: DownloadRecord = {
       ...download,
-      id: Date.now().toString(), // Use timestamp as unique ID
+      id: Date.now().toString(),
       downloadedAt: new Date().toISOString()
     };
     
-    // Add new download to the beginning of the array (most recent first)
-    const updated = [newDownload, ...existing];
-    
     // Save to session storage
+    const updated = [newDownload, ...existing];
     sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(updated));
     
-    // Dispatch custom event to notify components about the update
+    // Notify components
     window.dispatchEvent(new CustomEvent('download_history_updated'));
     
     return newDownload;
@@ -59,7 +47,7 @@ export const saveDownloadToHistory = (download: Omit<DownloadRecord, 'id' | 'dow
     console.error('Error saving to session storage:', err);
     return null;
   }
-};
+}
 
 export function DownloadHistorySection() {
   const [downloads, setDownloads] = useState<DownloadRecord[]>([]);
@@ -68,13 +56,20 @@ export function DownloadHistorySection() {
   // Load downloads from session storage
   const loadDownloads = () => {
     setLoading(true);
-    const sessionDownloads = getSessionDownloads();
-    setDownloads(sessionDownloads);
-    setLoading(false);
+    try {
+      const storedData = sessionStorage.getItem(SESSION_STORAGE_KEY);
+      const sessionDownloads: DownloadRecord[] = storedData ? JSON.parse(storedData) : [];
+      setDownloads(sessionDownloads);
+    } catch (err) {
+      console.error('Error loading download history:', err);
+      setDownloads([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Clear all downloads from session storage
-  const clearAllDownloads = () => {
+  // Clear all downloads
+  const handleClearDownloads = () => {
     sessionStorage.removeItem(SESSION_STORAGE_KEY);
     setDownloads([]);
     window.dispatchEvent(new CustomEvent('download_history_updated'));
@@ -152,7 +147,7 @@ export function DownloadHistorySection() {
           <Button 
             size="sm" 
             variant="outline"
-            onClick={clearAllDownloads}
+            onClick={handleClearDownloads}
             title="Clear all downloads"
             className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
           >
