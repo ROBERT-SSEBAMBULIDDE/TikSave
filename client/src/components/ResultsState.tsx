@@ -76,69 +76,61 @@ export function ResultsState({
       <div className="relative bg-gradient-to-b from-blue-50 to-slate-50 rounded-t-lg p-4">
         <h3 className="text-slate-700 font-medium text-lg mb-4 text-center">Preview & Download</h3>
         
-        <div className="aspect-w-9 aspect-h-16 max-w-xs mx-auto rounded-lg overflow-hidden shadow-lg">
-          <div className="bg-slate-800 rounded-md flex items-center justify-center relative">
-            {!isPlaying ? (
-              <>
+        <div className="max-w-xs mx-auto rounded-lg overflow-hidden shadow-lg">
+          <div className="relative aspect-[9/16] rounded-lg overflow-hidden bg-black">
+            {/* Video Thumbnail & Play Button (shown before playing) */}
+            {!isPlaying && (
+              <div className="absolute inset-0 z-10">
                 <img
                   src={videoData.thumbnailUrl}
-                  alt="Video thumbnail"
+                  alt={videoData.title}
                   className="w-full h-full object-cover rounded-md"
                 />
-                <div className="absolute inset-0 flex items-center justify-center">
+                <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
                   <Button
                     onClick={handlePreviewToggle}
-                    className="bg-blue-600 hover:bg-blue-700 text-white w-16 h-16 rounded-full flex items-center justify-center transition-all shadow-md"
+                    className="bg-blue-600 hover:bg-blue-700 text-white w-16 h-16 rounded-full flex items-center justify-center transition-all shadow-lg"
                   >
                     <FAIcon icon="play" className="text-xl ml-1" />
                   </Button>
                 </div>
-              </>
-            ) : (
-              <div className="w-full h-full relative">
-                <Button
-                  onClick={handlePreviewToggle}
-                  className="absolute top-2 right-2 z-10 bg-black bg-opacity-60 hover:bg-opacity-70 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all"
-                >
-                  <FAIcon icon="pause" />
-                </Button>
-                
-                {/* HTML5 Video Player */}
-                {!videoLoaded && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-slate-900">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
-                  </div>
-                )}
-                
-                <video
-                  ref={videoRef}
-                  src={`/api/tiktok/download?videoId=${videoData.id}&format=mp4&quality=${selectedQuality}`}
-                  className={`w-full h-full rounded-md ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
-                  controls={false}
-                  playsInline
-                  onLoadedData={() => setVideoLoaded(true)}
-                  onError={() => {
-                    // Fallback to iframe if direct video fails
-                    setVideoLoaded(true);
-                  }}
-                />
-                
-                {/* Fallback to iframe if HTML5 video fails */}
-                {!videoLoaded && (
-                  <iframe
-                    src={`https://www.tiktok.com/embed/v2/${videoData.id}`}
-                    className="w-full h-full rounded-md"
-                    allowFullScreen
-                    style={{ display: 'none' }}
-                    onLoad={() => {
-                      if (!videoLoaded) {
-                        setVideoLoaded(true);
-                      }
-                    }}
-                  />
-                )}
               </div>
             )}
+            
+            {/* Video Element with Controls */}
+            <div className={`w-full h-full ${isPlaying ? 'block' : 'hidden'}`}>
+              {/* Custom Video Controls */}
+              {isPlaying && (
+                <div className="absolute top-2 right-2 z-20">
+                  <Button
+                    onClick={handlePreviewToggle}
+                    className="bg-black bg-opacity-50 hover:bg-opacity-70 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all"
+                  >
+                    <FAIcon icon="pause" />
+                  </Button>
+                </div>
+              )}
+              
+              {/* Video Element */}
+              {isPlaying && (
+                <>
+                  {!videoLoaded && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+                    </div>
+                  )}
+                  <video
+                    ref={videoRef}
+                    src={`/api/tiktok/download?videoId=${videoData.id}&format=mp4&quality=${selectedQuality}`}
+                    className="w-full h-full object-contain rounded-md"
+                    controls
+                    playsInline
+                    autoPlay
+                    onLoadedData={() => setVideoLoaded(true)}
+                  />
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>

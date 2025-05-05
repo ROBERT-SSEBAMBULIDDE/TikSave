@@ -382,11 +382,13 @@ export async function processTikTokVideo(
   }
 }
 
+// Use fs import at the top level
+import * as fs from 'fs';
+
 // Clean up temporary files older than 6 hours
 export function cleanupTempFiles() {
   console.log('Cleaning up temporary files...');
   try {
-    const fs = require('fs');
     const files = fs.readdirSync(TMP_DIR);
     const now = Date.now();
     const sixHoursInMs = 6 * 60 * 60 * 1000;
