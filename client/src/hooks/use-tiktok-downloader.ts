@@ -140,7 +140,7 @@ export function useTikTokDownloader() {
       showToast('info', 'Download Started', 'Your file will be saved to your device shortly.');
       
       // Create a hidden link to trigger the download
-      const response = await fetch(`/api/tiktok/download?videoId=${downloadOptions.videoId}&format=${downloadOptions.format}&quality=${downloadOptions.quality}`);
+      const response = await fetch(`/api/tiktok/download?videoId=${downloadOptions.videoId}&format=${downloadOptions.format}&quality=${downloadOptions.quality}&videoUrl=${encodeURIComponent(videoData.url)}&thumbnailUrl=${encodeURIComponent(videoData.thumbnailUrl)}&title=${encodeURIComponent(videoData.title)}&author=${encodeURIComponent(videoData.author)}`);
       
       // Handle potential errors in the response
       if (!response.ok) {

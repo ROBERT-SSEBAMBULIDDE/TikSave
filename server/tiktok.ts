@@ -16,6 +16,7 @@ interface ProcessedVideo {
   filePath: string;
   fileName: string;
   timestamp: number;
+  fileSize?: number; // File size in bytes
 }
 
 // In-memory cache for processed videos
@@ -235,15 +236,31 @@ export async function processTikTokVideo(
   videoId: string, 
   format: DownloadFormat, 
   quality: VideoQuality
-): Promise<{ filePath: string, fileName: string }> {
+): Promise<{ filePath: string, fileName: string, fileSize?: number }> {
   try {
     // Check cache first to avoid reprocessing
     const cachedVideo = getFromCache(videoId, format, quality);
     if (cachedVideo) {
       console.log(`Cache hit: Using previously processed video for ${videoId} in ${format}/${quality} format`);
+      
+      // Get file size if not already in cache
+      let fileSize = cachedVideo.fileSize;
+      if (!fileSize && existsSync(cachedVideo.filePath)) {
+        try {
+          const stats = statSync(cachedVideo.filePath);
+          fileSize = stats.size;
+          
+          // Update cache with file size
+          cachedVideo.fileSize = fileSize;
+        } catch (err) {
+          console.error(`Failed to get file size for cached video:`, err);
+        }
+      }
+      
       return {
         filePath: cachedVideo.filePath,
-        fileName: cachedVideo.fileName
+        fileName: cachedVideo.fileName,
+        fileSize
       };
     }
     
@@ -358,15 +375,26 @@ export async function processTikTokVideo(
           const fileName = `tiktok_${videoId}.${format}`;
           console.log(`Processing complete: ${fileName}`);
           
+          // Get the file size
+          let fileSize: number | undefined;
+          try {
+            const stats = statSync(outputFilePath);
+            fileSize = stats.size;
+            console.log(`File size: ${fileSize} bytes`);
+          } catch (err) {
+            console.error(`Failed to get file size:`, err);
+          }
+          
           // Add to cache
           const processedVideo: ProcessedVideo = {
             filePath: outputFilePath,
             fileName,
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            fileSize
           };
           addToCache(videoId, format, quality, processedVideo);
           
-          resolve({ filePath: outputFilePath, fileName });
+          resolve({ filePath: outputFilePath, fileName, fileSize });
         } else {
           reject(new Error(`FFmpeg process exited with code ${code}`));
         }
