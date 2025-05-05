@@ -172,7 +172,7 @@ export function useTikTokDownloader() {
       };
       
       // Handle completion
-      xhr.onload = () => {
+      xhr.onload = async () => {
         if (xhr.status === 200) {
           // Update final progress state
           setProcessingStatus({ progress: 100, message: 'Download complete!' });
@@ -209,6 +209,26 @@ export function useTikTokDownloader() {
           // Cleanup
           window.URL.revokeObjectURL(downloadUrl);
           document.body.removeChild(a);
+          
+          // Add download to session history
+          try {
+            // Import here to avoid circular dependency
+            const { saveDownloadToHistory } = await import('@/components/DownloadHistorySection');
+            
+            // Save download to session history
+            saveDownloadToHistory({
+              videoId: downloadOptions.videoId,
+              videoUrl: videoData.url,
+              thumbnailUrl: videoData.thumbnailUrl,
+              title: videoData.title,
+              author: videoData.author,
+              format: downloadOptions.format,
+              quality: downloadOptions.quality,
+              fileSize: blob.size || null,
+            });
+          } catch (err) {
+            console.error('Failed to save download to history:', err);
+          }
           
           // Show success notification with message to download another video
           showToast('success', 'Download Complete', 'Your file has been saved. Ready for another download!');
