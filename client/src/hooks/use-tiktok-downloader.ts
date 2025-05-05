@@ -136,57 +136,110 @@ export function useTikTokDownloader() {
         quality: selectedQuality
       };
       
-      // Start download
-      showToast('info', 'Download Started', 'Your file will be saved to your device shortly.');
+      // Set processing state to show progress
+      setState('processing');
+      setProcessingStatus({ progress: 0, message: 'Starting download...' });
       
-      // Create a hidden link to trigger the download
-      const response = await fetch(`/api/tiktok/download?videoId=${downloadOptions.videoId}&format=${downloadOptions.format}&quality=${downloadOptions.quality}&videoUrl=${encodeURIComponent(videoData.url)}&thumbnailUrl=${encodeURIComponent(videoData.thumbnailUrl)}&title=${encodeURIComponent(videoData.title)}&author=${encodeURIComponent(videoData.author)}`);
+      // Show toast notification
+      showToast('info', 'Download Started', 'Please wait while we prepare your file.');
       
-      // Handle potential errors in the response
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Download failed');
-      }
+      // Create XHR request to track download progress
+      const xhr = new XMLHttpRequest();
+      const url = `/api/tiktok/download?videoId=${downloadOptions.videoId}&format=${downloadOptions.format}&quality=${downloadOptions.quality}&videoUrl=${encodeURIComponent(videoData.url)}&thumbnailUrl=${encodeURIComponent(videoData.thumbnailUrl)}&title=${encodeURIComponent(videoData.title)}&author=${encodeURIComponent(videoData.author)}`;
       
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
+      xhr.open('GET', url, true);
+      xhr.responseType = 'blob';
       
-      // Determine filename from Content-Disposition header if available
-      const contentDisposition = response.headers.get('Content-Disposition');
-      let filename = '';
-      
-      if (contentDisposition) {
-        const filenameMatch = contentDisposition.match(/filename="(.+)"/);
-        if (filenameMatch) {
-          filename = filenameMatch[1];
+      // Set up progress tracking
+      xhr.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const progress = Math.round((event.loaded / event.total) * 100);
+          
+          // Update progress messages based on phase
+          let message = 'Downloading...';
+          if (progress < 30) {
+            message = 'Preparing file...';
+          } else if (progress < 60) {
+            message = 'Downloading...';
+          } else if (progress < 90) {
+            message = 'Almost there...';
+          } else {
+            message = 'Completing download...';
+          }
+          
+          setProcessingStatus({ progress, message });
         }
-      }
+      };
       
-      // Fallback if filename isn't provided in headers
-      if (!filename) {
-        const extension = getFileExtensionFromFormat(selectedFormat);
-        filename = `tiktok_${videoData.id}${extension}`;
-      }
+      // Handle completion
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          // Update final progress state
+          setProcessingStatus({ progress: 100, message: 'Download complete!' });
+          
+          // Create download link
+          const blob = xhr.response;
+          const downloadUrl = window.URL.createObjectURL(blob);
+          
+          // Get filename from response headers if available
+          let filename = '';
+          const contentDisposition = xhr.getResponseHeader('Content-Disposition');
+          
+          if (contentDisposition) {
+            const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+            if (filenameMatch) {
+              filename = filenameMatch[1];
+            }
+          }
+          
+          // Fallback filename
+          if (!filename) {
+            const extension = getFileExtensionFromFormat(selectedFormat);
+            filename = `tiktok_${videoData.id}${extension}`;
+          }
+          
+          // Create and trigger download
+          const a = document.createElement('a');
+          a.style.display = 'none';
+          a.href = downloadUrl;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          
+          // Cleanup
+          window.URL.revokeObjectURL(downloadUrl);
+          document.body.removeChild(a);
+          
+          // Show success notification
+          showToast('success', 'Download Complete', 'Your file has been saved to your device.');
+          
+          // Return to results state after a short delay
+          setTimeout(() => {
+            setState('results');
+          }, 1500);
+        } else {
+          throw new Error('Download failed');
+        }
+      };
       
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
+      // Handle errors
+      xhr.onerror = () => {
+        setState('error');
+        setError({ message: 'Download failed', details: 'Network error occurred during download.' });
+        showToast('error', 'Download Failed', 'Network error occurred during download.');
+      };
       
-      // Cleanup
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      
-      showToast('success', 'Download Complete', 'Your file has been saved to your device.');
+      // Start the request
+      xhr.send();
     } catch (err) {
+      setState('error');
       let errorMessage = 'An unknown error occurred';
       
       if (err instanceof Error) {
         errorMessage = err.message;
       }
       
+      setError({ message: 'Download failed', details: errorMessage });
       showToast('error', 'Download Failed', errorMessage);
     }
   };

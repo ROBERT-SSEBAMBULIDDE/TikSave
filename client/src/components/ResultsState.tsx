@@ -121,7 +121,7 @@ export function ResultsState({
                   )}
                   <video
                     ref={videoRef}
-                    src={`/api/tiktok/download?videoId=${videoData.id}&format=mp4&quality=${selectedQuality}`}
+                    src={`/api/tiktok/download?videoId=${videoData.id}&format=mp4&quality=${selectedQuality}&videoUrl=${encodeURIComponent(videoData.url)}&thumbnailUrl=${encodeURIComponent(videoData.thumbnailUrl)}&title=${encodeURIComponent(videoData.title)}&author=${encodeURIComponent(videoData.author)}`}
                     className="w-full h-full object-contain rounded-md"
                     controls
                     playsInline
