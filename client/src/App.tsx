@@ -7,7 +7,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Terms from "@/pages/terms";
 import Privacy from "@/pages/privacy";
-const HowItWorks = () => import("@/pages/howitworks").then(module => module.default);
+import HowItWorks from "@/pages/HowItWorks";
 
 function Router() {
   return (
