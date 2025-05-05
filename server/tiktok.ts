@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 import { spawn } from 'child_process';
-import { createWriteStream, existsSync, mkdirSync } from 'fs';
+import { createWriteStream, existsSync, mkdirSync, statSync } from 'fs';
 import { pipeline } from 'stream/promises';
 import path from 'path';
 import { VideoData, DownloadFormat, VideoQuality } from '../client/src/lib/types';
@@ -9,6 +9,49 @@ import { VideoData, DownloadFormat, VideoQuality } from '../client/src/lib/types
 const TMP_DIR = path.join(process.cwd(), 'tmp');
 if (!existsSync(TMP_DIR)) {
   mkdirSync(TMP_DIR, { recursive: true });
+}
+
+// Simple cache to track processed videos and avoid redundant processing
+interface ProcessedVideo {
+  filePath: string;
+  fileName: string;
+  timestamp: number;
+}
+
+// In-memory cache for processed videos
+const videoCache: Map<string, Map<string, ProcessedVideo>> = new Map();
+
+// Cache helper functions
+function getCacheKey(videoId: string, format: DownloadFormat, quality: VideoQuality): string {
+  return `${videoId}_${format}_${quality}`;
+}
+
+function getFromCache(videoId: string, format: DownloadFormat, quality: VideoQuality): ProcessedVideo | null {
+  const formatCache = videoCache.get(videoId);
+  if (!formatCache) return null;
+  
+  const cacheKey = getCacheKey(videoId, format, quality);
+  const cachedVideo = formatCache.get(cacheKey);
+  
+  if (!cachedVideo) return null;
+  
+  // Verify the file still exists
+  if (!existsSync(cachedVideo.filePath)) {
+    formatCache.delete(cacheKey);
+    return null;
+  }
+  
+  return cachedVideo;
+}
+
+function addToCache(videoId: string, format: DownloadFormat, quality: VideoQuality, processedVideo: ProcessedVideo): void {
+  if (!videoCache.has(videoId)) {
+    videoCache.set(videoId, new Map());
+  }
+  
+  const formatCache = videoCache.get(videoId)!;
+  const cacheKey = getCacheKey(videoId, format, quality);
+  formatCache.set(cacheKey, processedVideo);
 }
 
 // RapidAPI configuration
@@ -194,6 +237,18 @@ export async function processTikTokVideo(
   quality: VideoQuality
 ): Promise<{ filePath: string, fileName: string }> {
   try {
+    // Check cache first to avoid reprocessing
+    const cachedVideo = getFromCache(videoId, format, quality);
+    if (cachedVideo) {
+      console.log(`Cache hit: Using previously processed video for ${videoId} in ${format}/${quality} format`);
+      return {
+        filePath: cachedVideo.filePath,
+        fileName: cachedVideo.fileName
+      };
+    }
+    
+    console.log(`Cache miss: Processing video ${videoId} in ${format}/${quality} format`);
+    
     // Use the videoId to form a URL, but note this may not be perfect for all TikTok videos
     // If we had the original URL, that would be better
     // For now, we'll use a generic URL that should work with the API
@@ -206,62 +261,85 @@ export async function processTikTokVideo(
     const outputFilePath = path.join(TMP_DIR, `${videoId}_${format}_${quality}.${format}`);
     
     // Set quality parameters based on selected quality
+    // Use faster presets across the board for better speed while maintaining quality
     let qualityParams: string[] = [];
     if (format === 'mp4') {
       switch (quality) {
         case 'high':
-          qualityParams = ['-crf', '18', '-preset', 'slow'];
+          qualityParams = ['-crf', '20', '-preset', 'faster', '-tune', 'zerolatency'];
           break;
         case 'medium':
-          qualityParams = ['-crf', '23', '-preset', 'medium'];
+          qualityParams = ['-crf', '23', '-preset', 'veryfast', '-tune', 'zerolatency'];
           break;
         case 'low':
-          qualityParams = ['-crf', '28', '-preset', 'fast'];
+          qualityParams = ['-crf', '28', '-preset', 'ultrafast', '-tune', 'zerolatency'];
           break;
       }
     } else if (format === 'webm') {
       switch (quality) {
         case 'high':
-          qualityParams = ['-crf', '20', '-b:v', '1M'];
+          qualityParams = ['-crf', '22', '-b:v', '1M', '-deadline', 'good', '-cpu-used', '2'];
           break;
         case 'medium':
-          qualityParams = ['-crf', '30', '-b:v', '500k'];
+          qualityParams = ['-crf', '30', '-b:v', '500k', '-deadline', 'realtime', '-cpu-used', '4'];
           break;
         case 'low':
-          qualityParams = ['-crf', '40', '-b:v', '200k'];
+          qualityParams = ['-crf', '40', '-b:v', '200k', '-deadline', 'realtime', '-cpu-used', '8'];
           break;
       }
     } else if (format === 'mp3') {
       switch (quality) {
         case 'high':
-          qualityParams = ['-b:a', '192k'];
+          qualityParams = ['-b:a', '192k', '-compression_level', '0'];
           break;
         case 'medium':
-          qualityParams = ['-b:a', '128k'];
+          qualityParams = ['-b:a', '128k', '-compression_level', '0'];
           break;
         case 'low':
-          qualityParams = ['-b:a', '96k'];
+          qualityParams = ['-b:a', '96k', '-compression_level', '0'];
           break;
       }
     }
     
     console.log(`Processing video to ${format} format with ${quality} quality...`);
     
-    // Build FFmpeg command
-    let ffmpegArgs: string[] = ['-i', originalVideoPath];
+    // Build optimized FFmpeg command
+    // Add threads for parallel processing and other optimizations
+    let ffmpegArgs: string[] = [
+      '-i', originalVideoPath,
+      '-threads', '4',  // Use parallel processing
+      '-y'  // Overwrite output files without asking
+    ];
     
     // Add format-specific arguments
     if (format === 'mp3') {
       ffmpegArgs = [
         ...ffmpegArgs,
         '-vn',  // No video
+        '-ar', '44100',  // Audio sampling rate
+        '-ac', '2',  // Audio channels
         ...qualityParams,
+        '-f', 'mp3',  // Force mp3 format
+        outputFilePath
+      ];
+    } else if (format === 'webm') {
+      ffmpegArgs = [
+        ...ffmpegArgs,
+        '-c:v', 'libvpx',  // Video codec for WebM
+        '-c:a', 'libvorbis',  // Audio codec for WebM
+        ...qualityParams,
+        '-f', 'webm',  // Force webm format
         outputFilePath
       ];
     } else {
+      // mp4 format (default)
       ffmpegArgs = [
         ...ffmpegArgs,
+        '-c:v', 'libx264',  // Video codec for MP4
+        '-c:a', 'aac',  // Audio codec for MP4
+        '-movflags', '+faststart',  // Optimize for web streaming
         ...qualityParams,
+        '-f', 'mp4',  // Force mp4 format
         outputFilePath
       ];
     }
@@ -279,6 +357,15 @@ export async function processTikTokVideo(
           // Generate a user-friendly filename
           const fileName = `tiktok_${videoId}.${format}`;
           console.log(`Processing complete: ${fileName}`);
+          
+          // Add to cache
+          const processedVideo: ProcessedVideo = {
+            filePath: outputFilePath,
+            fileName,
+            timestamp: Date.now()
+          };
+          addToCache(videoId, format, quality, processedVideo);
+          
           resolve({ filePath: outputFilePath, fileName });
         } else {
           reject(new Error(`FFmpeg process exited with code ${code}`));
@@ -295,8 +382,55 @@ export async function processTikTokVideo(
   }
 }
 
-// Clean up temporary files older than 1 hour
+// Clean up temporary files older than 6 hours
 export function cleanupTempFiles() {
-  // Implementation omitted for brevity
-  // In a real implementation, this would delete files in TMP_DIR that are older than a certain time
+  console.log('Cleaning up temporary files...');
+  try {
+    const fs = require('fs');
+    const files = fs.readdirSync(TMP_DIR);
+    const now = Date.now();
+    const sixHoursInMs = 6 * 60 * 60 * 1000;
+    
+    let deletedCount = 0;
+    
+    files.forEach(file => {
+      try {
+        const filePath = path.join(TMP_DIR, file);
+        const stats = fs.statSync(filePath);
+        const fileAge = now - stats.mtimeMs;
+        
+        // Delete files older than 6 hours
+        if (fileAge > sixHoursInMs) {
+          fs.unlinkSync(filePath);
+          deletedCount++;
+          
+          // Also remove from cache if it was there
+          const videoIdMatch = file.match(/^([^_]+)_/);
+          if (videoIdMatch) {
+            const videoId = videoIdMatch[1];
+            if (videoCache.has(videoId)) {
+              const formatCache = videoCache.get(videoId)!;
+              // Find and remove any cache entries for this file
+              for (const [key, value] of formatCache.entries()) {
+                if (value.filePath === filePath) {
+                  formatCache.delete(key);
+                }
+              }
+              
+              // Remove the entire video entry if no formats are left
+              if (formatCache.size === 0) {
+                videoCache.delete(videoId);
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.error(`Error cleaning up file ${file}:`, err);
+      }
+    });
+    
+    console.log(`Cleanup complete. Deleted ${deletedCount} old files.`);
+  } catch (err) {
+    console.error('Error during cleanup:', err);
+  }
 }

@@ -17,10 +17,10 @@ export function Footer() {
           <div>
             <h3 className="font-semibold text-white mb-4">Quick Links</h3>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/"><a className="hover:text-white transition-colors">Home</a></Link></li>
+              <li><Link href="/"><div className="hover:text-white transition-colors cursor-pointer">Home</div></Link></li>
               <li><a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a></li>
-              <li><Link href="/terms"><a className="hover:text-white transition-colors">Terms of Service</a></Link></li>
-              <li><Link href="/privacy"><a className="hover:text-white transition-colors">Privacy Policy</a></Link></li>
+              <li><Link href="/terms"><div className="hover:text-white transition-colors cursor-pointer">Terms of Service</div></Link></li>
+              <li><Link href="/privacy"><div className="hover:text-white transition-colors cursor-pointer">Privacy Policy</div></Link></li>
             </ul>
           </div>
           

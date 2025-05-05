@@ -40,10 +40,13 @@ export function useTikTokDownloader() {
     try {
       setState('processing');
       
-      // Simulate progress intervals for better UX
+      // Simulate progress intervals for better UX - faster progress for perceived speed
       let progress = 0;
       const progressInterval = setInterval(() => {
-        progress += 5;
+        // Faster initial progress for better perceived speed
+        const increment = progress < 30 ? 8 : progress < 60 ? 5 : progress < 85 ? 3 : 1;
+        progress += increment;
+        
         if (progress < 30) {
           setProcessingStatus({ progress, message: 'Fetching video information...' });
         } else if (progress < 60) {
@@ -57,7 +60,7 @@ export function useTikTokDownloader() {
         if (progress >= 100) {
           clearInterval(progressInterval);
         }
-      }, 150);
+      }, 100);
 
       // Make API request to fetch video data
       const response = await apiRequest('POST', '/api/tiktok/info', { url });
