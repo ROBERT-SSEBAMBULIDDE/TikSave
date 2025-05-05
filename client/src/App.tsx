@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Terms from "@/pages/terms";
 import Privacy from "@/pages/privacy";
+const HowItWorks = () => import("@/pages/howitworks").then(module => module.default);
 
 function Router() {
   return (
@@ -14,6 +15,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/terms" component={Terms} />
       <Route path="/privacy" component={Privacy} />
+      <Route path="/how-it-works" component={HowItWorks} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>

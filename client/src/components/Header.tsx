@@ -14,9 +14,11 @@ export function Header() {
         <nav>
           <ul className="flex space-x-4 sm:space-x-6">
             <li>
-              <a href="#how-it-works" className="text-white hover:text-blue-200 text-sm sm:text-base font-medium transition-colors">
-                How it works
-              </a>
+              <Link href="/how-it-works">
+                <div className="text-white hover:text-blue-200 text-sm sm:text-base font-medium transition-colors cursor-pointer">
+                  How it works
+                </div>
+              </Link>
             </li>
             <li>
               <Link href="/terms">
