@@ -2,10 +2,12 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
-import { tiktokUrlSchema, downloadOptionsSchema } from "../shared/schema";
+import { tiktokUrlSchema, downloadOptionsSchema, insertDownloadHistorySchema } from "../shared/schema";
 import { getTikTokVideoInfo, processTikTokVideo } from "./tiktok";
 import path from "path";
 import fs from "fs";
+import { db } from "./db";
+import { downloadsHistory } from "../shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // TikTok Video Info Route
@@ -51,8 +53,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         quality: req.query.quality
       });
       
+      // Additional required parameters for download history
+      const videoUrl = req.query.videoUrl as string;
+      const thumbnailUrl = req.query.thumbnailUrl as string;
+      const title = req.query.title as string;
+      const author = req.query.author as string;
+      
+      if (!videoUrl || !thumbnailUrl || !title || !author) {
+        return res.status(400).json({ message: "Missing required video details" });
+      }
+      
       // Process the video with the selected format and quality
-      const { filePath, fileName } = await processTikTokVideo(
+      const { filePath, fileName, fileSize } = await processTikTokVideo(
         validatedData.videoId,
         validatedData.format,
         validatedData.quality
@@ -61,6 +73,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if file exists
       if (!fs.existsSync(filePath)) {
         return res.status(404).json({ message: "Video file not found" });
+      }
+      
+      // Record download in history before sending response
+      try {
+        await db.insert(downloadsHistory).values({
+          videoId: validatedData.videoId,
+          videoUrl,
+          thumbnailUrl,
+          title,
+          author,
+          format: validatedData.format,
+          quality: validatedData.quality,
+          fileSize: fileSize || 0,
+          ipAddress: req.ip || '127.0.0.1',
+          userAgent: req.get('User-Agent') || 'Unknown'
+        });
+      } catch (dbError) {
+        console.error("Failed to record download history:", dbError);
+        // Continue with download even if recording history fails
       }
       
       // Set appropriate headers for the response
@@ -106,6 +137,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof Error) {
         return res.status(500).json({ 
           message: "Failed to process video download", 
+          details: error.message 
+        });
+      }
+      
+      res.status(500).json({ 
+        message: "An unknown error occurred" 
+      });
+    }
+  });
+  
+  // Get Recent Downloads
+  app.get("/api/downloads/recent", async (req: Request, res: Response) => {
+    try {
+      // Get limit from query params, default to 10
+      const limit = parseInt(req.query.limit as string) || 10;
+      
+      // Get recent downloads from database (order by most recent)
+      const recentDownloads = await db.query.downloadsHistory.findMany({
+        orderBy: (downloads, { desc }) => [desc(downloads.downloadedAt)],
+        limit
+      });
+      
+      res.json(recentDownloads);
+    } catch (error) {
+      console.error("Error fetching recent downloads:", error);
+      
+      if (error instanceof Error) {
+        return res.status(500).json({ 
+          message: "Failed to fetch recent downloads", 
           details: error.message 
         });
       }

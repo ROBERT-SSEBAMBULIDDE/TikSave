@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -49,3 +49,27 @@ export const downloadOptionsSchema = z.object({
   format: z.enum(["mp4", "mp3", "webm"]),
   quality: z.enum(["high", "medium", "low"]),
 });
+
+// Define the downloads history table to track recent downloads
+export const downloadsHistory = pgTable("downloads_history", {
+  id: serial("id").primaryKey(),
+  videoId: text("video_id").notNull(),
+  videoUrl: text("video_url").notNull(),
+  thumbnailUrl: text("thumbnail_url").notNull(),
+  title: text("title").notNull(),
+  author: text("author").notNull(),
+  format: varchar("format", { length: 10 }).notNull(), // mp4, mp3, webm
+  quality: varchar("quality", { length: 10 }).notNull(), // high, medium, low
+  fileSize: integer("file_size"), // Size in bytes (optional)
+  ipAddress: text("ip_address").notNull(),
+  userAgent: text("user_agent").notNull(),
+  downloadedAt: timestamp("downloaded_at").defaultNow().notNull(),
+});
+
+export const insertDownloadHistorySchema = createInsertSchema(downloadsHistory).omit({
+  id: true,
+  downloadedAt: true,
+});
+
+export type InsertDownloadHistory = z.infer<typeof insertDownloadHistorySchema>;
+export type DownloadHistory = typeof downloadsHistory.$inferSelect;
