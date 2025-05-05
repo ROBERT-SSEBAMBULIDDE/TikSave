@@ -110,6 +110,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           break;
       }
       
+      // Get file size and set Content-Length header for progress tracking
+      const stats = fs.statSync(filePath);
+      res.setHeader("Content-Length", stats.size);
+      
       // Stream the file to the client
       const fileStream = fs.createReadStream(filePath);
       fileStream.pipe(res);

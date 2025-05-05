@@ -150,24 +150,57 @@ export function useTikTokDownloader() {
       xhr.open('GET', url, true);
       xhr.responseType = 'blob';
       
+      // Initialize the progress with loading message
+      setProcessingStatus({ progress: 0, message: 'Connecting to server...' });
+      
+      // Updates every 250ms to prevent UI flickering
+      let lastUpdate = Date.now();
+      let lastProgress = 0;
+      
       // Set up progress tracking
       xhr.onprogress = (event) => {
+        // Only update if progress is computable (Content-Length header is set)
         if (event.lengthComputable) {
+          // Calculate current progress percentage
           const progress = Math.round((event.loaded / event.total) * 100);
           
-          // Update progress messages based on phase
-          let message = 'Downloading...';
-          if (progress < 30) {
-            message = 'Preparing file...';
-          } else if (progress < 60) {
-            message = 'Downloading...';
-          } else if (progress < 90) {
-            message = 'Almost there...';
-          } else {
-            message = 'Completing download...';
+          // Only update UI if progress has changed significantly or 250ms passed since last update
+          // This prevents excessive re-renders while ensuring smooth progress
+          const now = Date.now();
+          if (progress > lastProgress + 1 || now - lastUpdate > 250) {
+            lastUpdate = now;
+            lastProgress = progress;
+            
+            // Update progress messages based on phase
+            let message = 'Downloading...';
+            if (progress < 20) {
+              message = 'Starting download...';
+            } else if (progress < 40) {
+              message = 'Downloading... keep going!';
+            } else if (progress < 60) {
+              message = 'Halfway there...';
+            } else if (progress < 80) {
+              message = 'Almost there...';
+            } else if (progress < 95) {
+              message = 'Just a moment longer...';
+            } else {
+              message = 'Finalizing download...';
+            }
+            
+            setProcessingStatus({ progress, message });
           }
-          
-          setProcessingStatus({ progress, message });
+        } else {
+          // If progress is not computable, show indeterminate progress
+          const now = Date.now();
+          if (now - lastUpdate > 1000) {
+            lastUpdate = now;
+            const fakeProgress = Math.min(lastProgress + 5, 90); // Don't go beyond 90%
+            lastProgress = fakeProgress;
+            setProcessingStatus({ 
+              progress: fakeProgress, 
+              message: 'Downloading... size unknown' 
+            });
+          }
         }
       };
       
