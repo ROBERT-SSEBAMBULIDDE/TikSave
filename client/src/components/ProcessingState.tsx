@@ -4,9 +4,10 @@ import { FAIcon } from "@/components/ui/fa-icon";
 
 interface ProcessingStateProps {
   processing: ProcessingStatus;
+  onReset?: () => void; // Optional reset callback
 }
 
-export function ProcessingState({ processing }: ProcessingStateProps) {
+export function ProcessingState({ processing, onReset }: ProcessingStateProps) {
   // Determine icon based on message
   const getIcon = () => {
     const message = processing.message.toLowerCase();
@@ -59,6 +60,19 @@ export function ProcessingState({ processing }: ProcessingStateProps) {
         </div>
       </div>
       
+      {/* Download Another Video button - only show when complete */}
+      {processing.progress === 100 && onReset && (
+        <div className="mb-6 text-center">
+          <button
+            onClick={onReset}
+            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-medium shadow-md hover:from-blue-700 hover:to-blue-800 transition-all flex items-center justify-center mx-auto"
+          >
+            <FAIcon icon="arrow-left" className="mr-2" />
+            Download Another Video
+          </button>
+        </div>
+      )}
+
       <div className="text-center text-xs text-slate-500">
         <p>SamaBrains uses advanced technology to process TikTok videos quickly and efficiently.</p>
       </div>

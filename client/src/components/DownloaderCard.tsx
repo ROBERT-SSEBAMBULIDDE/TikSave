@@ -86,7 +86,10 @@ export function DownloaderCard() {
           )}
           
           {state === 'processing' && (
-            <ProcessingState processing={processingStatus} />
+            <ProcessingState 
+              processing={processingStatus} 
+              onReset={reset} 
+            />
           )}
           
           {state === 'results' && videoData && (

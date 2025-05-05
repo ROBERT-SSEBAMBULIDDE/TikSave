@@ -210,12 +210,13 @@ export function useTikTokDownloader() {
           window.URL.revokeObjectURL(downloadUrl);
           document.body.removeChild(a);
           
-          // Show success notification
-          showToast('success', 'Download Complete', 'Your file has been saved to your device.');
+          // Show success notification with message to download another video
+          showToast('success', 'Download Complete', 'Your file has been saved. Ready for another download!');
           
-          // Return to results state after a short delay
+          // Return to initial state after a short delay so user can download another video
           setTimeout(() => {
-            setState('results');
+            setState('initial');
+            setUrl(''); // Clear the URL input
           }, 1500);
         } else {
           throw new Error('Download failed');
