@@ -31,6 +31,23 @@ export function useTikTokDownloader() {
   const processUrl = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Access the form directly to get selected format and quality
+    const form = e.target as HTMLFormElement;
+    const formElements = form.elements;
+    
+    // Get selected format and quality from form if they exist
+    const formatElement = formElements.namedItem('format') as HTMLInputElement;
+    const qualityElement = formElements.namedItem('quality') as HTMLInputElement;
+    
+    // Set format and quality if they exist in the form
+    if (formatElement && formatElement.value) {
+      setSelectedFormat(formatElement.value as DownloadFormat);
+    }
+    
+    if (qualityElement && qualityElement.value) {
+      setSelectedQuality(qualityElement.value as VideoQuality);
+    }
+    
     if (!isValidTikTokUrl(url)) {
       setState('error');
       setError({ message: 'Invalid URL provided', details: 'Please check the URL and try again. Make sure it\'s a valid TikTok video link.' });
