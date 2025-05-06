@@ -10,6 +10,7 @@ import Privacy from "@/pages/privacy";
 import HowItWorks from "@/pages/howitworks";
 import { ThemeProvider } from "./providers/ThemeProvider";
 import { InstallAppButton } from "@/components/InstallAppButton";
+import { MobileInstallBanner } from "@/components/MobileInstallBanner";
 
 function Router() {
   return (
@@ -30,6 +31,7 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
+          <MobileInstallBanner />
           <Router />
           <InstallAppButton />
         </TooltipProvider>

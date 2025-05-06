@@ -1,8 +1,47 @@
 import { FAIcon } from "@/components/ui/fa-icon";
 import { Link } from "wouter";
 import { ThemeToggle } from "./ThemeToggle";
+import { PWAInstallModal } from "./PWAInstallModal";
+import { useState, useEffect } from "react";
 
 export function Header() {
+  // Check if we're running in a standalone PWA mode
+  const [isStandalone, setIsStandalone] = useState(false);
+  
+  useEffect(() => {
+    const checkStandalone = () => {
+      const isInStandaloneMode = 
+        window.matchMedia('(display-mode: standalone)').matches || 
+        (window.navigator as any).standalone || 
+        document.referrer.includes('android-app://');
+      
+      setIsStandalone(isInStandaloneMode);
+    };
+    
+    checkStandalone();
+    
+    // Listen for changes in display mode
+    const mediaQuery = window.matchMedia('(display-mode: standalone)');
+    const listener = (e: MediaQueryListEvent) => {
+      setIsStandalone(e.matches);
+    };
+    
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', listener);
+    } else {
+      // Fallback for older browsers
+      mediaQuery.addListener(listener);
+    }
+    
+    return () => {
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener('change', listener);
+      } else {
+        mediaQuery.removeListener(listener);
+      }
+    };
+  }, []);
+  
   return (
     <header className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-md dark:from-gray-800 dark:to-gray-900">
       <div className="max-w-5xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
@@ -38,6 +77,13 @@ export function Header() {
               </li>
             </ul>
           </nav>
+          
+          {/* Only show install button if not already in standalone mode */}
+          {!isStandalone && (
+            <div className="hidden sm:block mr-3">
+              <PWAInstallModal />
+            </div>
+          )}
           
           {/* Theme toggle */}
           <ThemeToggle />
