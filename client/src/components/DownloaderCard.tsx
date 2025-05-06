@@ -6,6 +6,7 @@ import { ErrorState } from "@/components/ErrorState";
 import { ToastNotification } from "@/components/ToastNotification";
 import { useTikTokDownloader } from "@/hooks/use-tiktok-downloader";
 import { FAIcon } from "@/components/ui/fa-icon";
+import { AdContainer } from "@/components/AdContainer";
 
 export function DownloaderCard() {
   const {
