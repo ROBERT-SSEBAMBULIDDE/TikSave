@@ -7,7 +7,6 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Terms from "@/pages/terms";
 import Privacy from "@/pages/privacy";
-import HowItWorks from "@/pages/HowItWorks";
 import { ThemeProvider } from "./providers/ThemeProvider";
 
 function Router() {
@@ -16,7 +15,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/terms" component={Terms} />
       <Route path="/privacy" component={Privacy} />
-      <Route path="/how-it-works" component={HowItWorks} />
+      <Route path="/how-it-works" component={Home} /> {/* Temporarily using Home component */}
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
