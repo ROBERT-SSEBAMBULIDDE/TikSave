@@ -1,0 +1,61 @@
+<svg width="390" height="844" viewBox="0 0 390 844" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="390" height="844" fill="#f8fafc" />
+  
+  <!-- Header -->
+  <rect width="390" height="70" fill="#1d4ed8" />
+  <text x="20" y="44" font-family="Arial" font-size="24" font-weight="bold" fill="white">TikSave</text>
+  
+  <!-- Hero section -->
+  <rect y="70" width="390" height="200" fill="#1e40af" />
+  <text x="195" y="140" font-family="Arial" font-size="28" font-weight="bold" fill="white" text-anchor="middle">Download TikTok Videos</text>
+  <text x="195" y="170" font-family="Arial" font-size="18" fill="white" text-anchor="middle">Without Watermarks</text>
+  
+  <!-- Input form -->
+  <rect x="20" y="200" width="350" height="60" rx="8" fill="white" stroke="#e2e8f0" />
+  <text x="40" y="235" font-family="Arial" font-size="14" fill="#94a3b8">Paste TikTok link here...</text>
+  
+  <!-- Download button -->
+  <rect x="120" y="280" width="150" height="50" rx="8" fill="#1d4ed8" />
+  <text x="195" y="310" font-family="Arial" font-size="16" font-weight="bold" fill="white" text-anchor="middle">Download</text>
+  
+  <!-- Format options -->
+  <text x="20" y="370" font-family="Arial" font-size="16" font-weight="bold" fill="#334155">Format:</text>
+  <rect x="20" y="380" width="70" height="40" rx="4" fill="#1d4ed8" />
+  <text x="55" y="405" font-family="Arial" font-size="14" fill="white" text-anchor="middle">MP4</text>
+  
+  <rect x="100" y="380" width="70" height="40" rx="4" fill="#e2e8f0" />
+  <text x="135" y="405" font-family="Arial" font-size="14" fill="#334155" text-anchor="middle">MP3</text>
+  
+  <rect x="180" y="380" width="70" height="40" rx="4" fill="#e2e8f0" />
+  <text x="215" y="405" font-family="Arial" font-size="14" fill="#334155" text-anchor="middle">WEBM</text>
+  
+  <!-- Quality options -->
+  <text x="20" y="450" font-family="Arial" font-size="16" font-weight="bold" fill="#334155">Quality:</text>
+  <rect x="20" y="460" width="70" height="40" rx="4" fill="#1d4ed8" />
+  <text x="55" y="485" font-family="Arial" font-size="14" fill="white" text-anchor="middle">High</text>
+  
+  <rect x="100" y="460" width="70" height="40" rx="4" fill="#e2e8f0" />
+  <text x="135" y="485" font-family="Arial" font-size="14" fill="#334155" text-anchor="middle">Medium</text>
+  
+  <rect x="180" y="460" width="70" height="40" rx="4" fill="#e2e8f0" />
+  <text x="215" y="485" font-family="Arial" font-size="14" fill="#334155" text-anchor="middle">Low</text>
+  
+  <!-- Recent downloads section -->
+  <text x="20" y="540" font-family="Arial" font-size="18" font-weight="bold" fill="#334155">Recent Downloads</text>
+  
+  <!-- Download item -->
+  <rect x="20" y="560" width="350" height="80" rx="8" fill="white" stroke="#e2e8f0" />
+  <rect x="30" y="570" width="60" height="60" rx="4" fill="#e2e8f0" />
+  <text x="105" y="590" font-family="Arial" font-size="14" font-weight="bold" fill="#334155">TikTok Video</text>
+  <text x="105" y="610" font-family="Arial" font-size="12" fill="#64748b">@username · 2 minutes ago</text>
+  
+  <rect x="20" y="650" width="350" height="80" rx="8" fill="white" stroke="#e2e8f0" />
+  <rect x="30" y="660" width="60" height="60" rx="4" fill="#e2e8f0" />
+  <text x="105" y="680" font-family="Arial" font-size="14" font-weight="bold" fill="#334155">TikTok Video</text>
+  <text x="105" y="700" font-family="Arial" font-size="12" fill="#64748b">@username · 5 minutes ago</text>
+  
+  <!-- Footer -->
+  <rect y="780" width="390" height="64" fill="#1d4ed8" />
+  <text x="195" y="820" font-family="Arial" font-size="12" fill="white" text-anchor="middle">© 2025 TikSave by SamaBrains • Uganda, Kampala</text>
+</svg>

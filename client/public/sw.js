@@ -1,6 +1,6 @@
 // Service Worker for TikSave PWA
 
-const CACHE_NAME = 'tiksave-v1';
+const CACHE_NAME = 'tiksave-v2';
 const urlsToCache = [
   '/',
   '/index.html',
