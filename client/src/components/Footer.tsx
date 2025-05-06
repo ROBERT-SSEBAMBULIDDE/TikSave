@@ -9,7 +9,7 @@ export function Footer() {
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <FAIcon icon="cloud-download-alt" className="text-white text-xl" />
-              <h2 className="font-bold text-xl text-white">SamaBrains TikTok Downloader</h2>
+              <h2 className="font-bold text-xl text-white">TikSave</h2>
             </div>
             <p className="text-sm">The fastest way to download TikTok videos without watermarks.</p>
           </div>

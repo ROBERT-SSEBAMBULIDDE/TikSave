@@ -10,7 +10,7 @@ export function HeroSection() {
           </div>
         </div>
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-200">
-          Download TikTok Videos Without Watermark
+          TikSave - Download TikTok Videos Without Watermark
         </h2>
         <p className="text-base sm:text-xl text-blue-100 mb-8 max-w-2xl mx-auto leading-relaxed">
           Save high-quality TikTok videos directly to your device in seconds. 

@@ -9,7 +9,7 @@ export function Header() {
         <Link href="/">
           <div className="flex items-center space-x-2 cursor-pointer">
             <FAIcon icon="cloud-download-alt" className="text-white text-2xl" />
-            <h1 className="font-bold text-xl sm:text-2xl text-white">SamaBrains Downloader</h1>
+            <h1 className="font-bold text-xl sm:text-2xl text-white">TikSave</h1>
           </div>
         </Link>
         <div className="flex items-center">
