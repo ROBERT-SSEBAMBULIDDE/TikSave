@@ -49,12 +49,27 @@ export function ShareAppCTA() {
   };
   
   const handleInstallClick = () => {
-    if (isIOS) {
+    // Show more comprehensive instructions regardless of detected platform
+    const userAgent = navigator.userAgent.toLowerCase();
+    
+    if (/iphone|ipad|ipod/.test(userAgent)) {
+      // iOS-specific instructions
       setShowIOSInstallGuide(true);
-    } else if (isAndroid) {
-      alert("To install this app on Android:\n\n1. Tap the menu button (three dots) in your browser\n2. Tap 'Add to Home screen'\n3. Follow the on-screen instructions");
+    } else if (/android/.test(userAgent)) {
+      // Android-specific instructions
+      alert("Install on Android:\n\n1. Tap the menu button (⋮) in Chrome\n2. Select 'Add to Home screen'\n3. Confirm by tapping 'Add'");
+    } else if (/chrome/.test(userAgent)) {
+      // Chrome desktop instructions
+      alert("Install on Chrome:\n\n1. Look for the install icon (+) in the address bar\n2. Click 'Install'\n\nIf you don't see the icon, click the three dots menu (⋮) and select 'Install TikSave...'");
+    } else if (/firefox/.test(userAgent)) {
+      // Firefox instructions
+      alert("Install on Firefox:\n\n1. Click the three lines menu (≡)\n2. Select 'Add to Home Screen' or 'Install'");
+    } else if (/safari/.test(userAgent)) {
+      // Safari desktop instructions
+      alert("Install on Safari:\n\n1. Click the Share button\n2. Select 'Add to Home Screen'");
     } else {
-      alert("To install this app on your device:\n\nIn Chrome/Edge: Look for the install icon in the address bar\nIn Safari: Use the Share button and tap 'Add to Home Screen'");
+      // Generic instructions for all other browsers
+      alert("To install this app:\n\n• Mobile: Look for 'Add to Home Screen' option in your browser menu\n• Desktop: Look for install icon in address bar or browser menu\n\nIf you need help, check your browser's instructions for installing web apps.");
     }
   };
 
@@ -69,8 +84,8 @@ export function ShareAppCTA() {
             </p>
           </div>
           
-          {/* Mobile Install Button - Only show if not already installed as app */}
-          {!isStandalone && (isIOS || isAndroid) && (
+          {/* Install Button - Show for all devices since detection may fail */}
+          {!isStandalone && (
             <Button 
               variant="default" 
               className="w-full mb-4 bg-blue-600 hover:bg-blue-700"

@@ -10,6 +10,7 @@ import Privacy from "@/pages/privacy";
 import HowItWorks from "@/pages/howitworks";
 import { ThemeProvider } from "./providers/ThemeProvider";
 import { MobileInstallGuide } from "@/components/MobileInstallGuide";
+import { PersistentInstallBanner } from "@/components/PersistentInstallBanner";
 
 function Router() {
   return (
@@ -32,6 +33,7 @@ function App() {
           <Toaster />
           <Router />
           <MobileInstallGuide />
+          <PersistentInstallBanner />
         </TooltipProvider>
       </QueryClientProvider>
     </ThemeProvider>

@@ -1,6 +1,6 @@
 // Service Worker for TikSave PWA
 
-const CACHE_NAME = 'tiksave-v3';
+const CACHE_NAME = 'tiksave-v4';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -8,7 +8,10 @@ const urlsToCache = [
   '/manifest.json',
   '/icons/app-icon.svg',
   '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png'
+  '/icons/icon-512x512.png',
+  // Add CSS and JS assets to cache
+  '/assets/index.css',
+  '/assets/index.js'
 ];
 
 // Install Service Worker
@@ -38,6 +41,18 @@ self.addEventListener('activate', event => {
       );
     })
   );
+});
+
+// Handle app installation events
+self.addEventListener('appinstalled', (event) => {
+  console.log('App was installed', event);
+});
+
+// Listen for messages from the main thread
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 // Serve cached content when offline
