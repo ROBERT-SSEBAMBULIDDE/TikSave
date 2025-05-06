@@ -3,6 +3,23 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Share2, Twitter, Facebook, Download, Heart } from "lucide-react";
 
+// Define the BeforeInstallPromptEvent interface for window.deferredPrompt
+interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: string[];
+  readonly userChoice: Promise<{
+    outcome: 'accepted' | 'dismissed';
+    platform: string;
+  }>;
+  prompt(): Promise<void>;
+}
+
+// Extend Window interface to include our deferredPrompt property
+declare global {
+  interface Window {
+    deferredPrompt: BeforeInstallPromptEvent | null;
+  }
+}
+
 export function ShareAppCTA() {
   const [isIOS, setIsIOS] = useState(false);
   const [isAndroid, setIsAndroid] = useState(false);
@@ -84,17 +101,30 @@ export function ShareAppCTA() {
             </p>
           </div>
           
-          {/* Install Button - Show for all devices since detection may fail */}
-          {!isStandalone && (
-            <Button 
-              variant="default" 
-              className="w-full mb-4 bg-blue-600 hover:bg-blue-700"
-              onClick={handleInstallClick}
-            >
-              <Download className="mr-2 h-4 w-4" />
-              Install TikSave App
-            </Button>
-          )}
+          {/* Direct Install Button using beforeinstallprompt event if available */}
+          <Button 
+            variant="default" 
+            className="w-full mb-4 bg-blue-600 hover:bg-blue-700"
+            onClick={() => {
+              // First try to use the deferredPrompt if available
+              if (window.deferredPrompt) {
+                window.deferredPrompt.prompt();
+                window.deferredPrompt.userChoice.then(choiceResult => {
+                  if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                  }
+                  // Clear the prompt
+                  window.deferredPrompt = null;
+                });
+              } else {
+                // Otherwise use the fallback instructions
+                handleInstallClick();
+              }
+            }}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Install TikSave App
+          </Button>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
             {/* Web Share API (Mobile-friendly) */}
