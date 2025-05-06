@@ -1,212 +1,253 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Share2, Twitter, Facebook, Download, Heart } from "lucide-react";
-
-// Define the BeforeInstallPromptEvent interface for window.deferredPrompt
-interface BeforeInstallPromptEvent extends Event {
-  readonly platforms: string[];
-  readonly userChoice: Promise<{
-    outcome: 'accepted' | 'dismissed';
-    platform: string;
-  }>;
-  prompt(): Promise<void>;
-}
-
-// Extend Window interface to include our deferredPrompt property
-declare global {
-  interface Window {
-    deferredPrompt: BeforeInstallPromptEvent | null;
-  }
-}
+import { Download } from "lucide-react";
 
 export function ShareAppCTA() {
-  const [isIOS, setIsIOS] = useState(false);
-  const [isAndroid, setIsAndroid] = useState(false);
-  const [isStandalone, setIsStandalone] = useState(false);
-  const [showIOSInstallGuide, setShowIOSInstallGuide] = useState(false);
-  
-  useEffect(() => {
-    // Check if we're already in standalone/installed mode
-    const isInStandaloneMode = () => 
-      window.matchMedia('(display-mode: standalone)').matches || 
-      (window.navigator as any).standalone || 
-      document.referrer.includes('android-app://');
-    
-    setIsStandalone(isInStandaloneMode());
-    
-    // Detect mobile platforms
-    const userAgent = navigator.userAgent.toLowerCase();
-    setIsIOS(/iphone|ipad|ipod/.test(userAgent));
-    setIsAndroid(/android/.test(userAgent));
-  }, []);
-  
-  const shareUrl = window.location.origin;
-  const shareTitle = "TikSave - Download TikTok Videos Without Watermark";
-  const shareText = "I'm using TikSave to download TikTok videos without watermarks. It's fast and free. Check it out!";
-
-  const shareViaWebShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: shareTitle,
-        text: shareText,
-        url: shareUrl,
-      }).catch(err => console.error('Error sharing:', err));
+  const handleInstall = () => {
+    // Try to trigger native install prompt
+    if (typeof window !== 'undefined') {
+      // If we have the deferredPrompt already stored by our script
+      if ((window as any).deferredPrompt) {
+        (window as any).deferredPrompt.prompt();
+        (window as any).deferredPrompt.userChoice.then((choiceResult: any) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted the install prompt');
+          }
+          // Clear the prompt
+          (window as any).deferredPrompt = null;
+        });
+      } else {
+        // Get user agent for platform detection
+        const userAgent = navigator.userAgent.toLowerCase();
+        
+        // Simple detection for major platforms
+        if (/iphone|ipad|ipod/.test(userAgent)) {
+          // Show iOS installation dialog
+          showIOSInstallDialog();
+        } else if (/android/.test(userAgent)) {
+          // Show Android installation dialog
+          showAndroidInstallDialog();
+        } else {
+          // Show generic installation dialog
+          showGenericInstallDialog();
+        }
+      }
     }
   };
-
-  const shareViaTwitter = () => {
-    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
-    window.open(twitterUrl, '_blank');
-  };
-
-  const shareViaFacebook = () => {
-    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
-    window.open(facebookUrl, '_blank');
+  
+  const showIOSInstallDialog = () => {
+    // Force iOS users to use Add to Home Screen
+    // Create a full-screen modal with clear instructions
+    const modal = document.createElement('div');
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.right = '0';
+    modal.style.bottom = '0';
+    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    modal.style.zIndex = '9999';
+    modal.style.display = 'flex';
+    modal.style.flexDirection = 'column';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+    modal.style.padding = '20px';
+    modal.style.fontFamily = 'system-ui, -apple-system, sans-serif';
+    
+    // Create close button
+    const closeButton = document.createElement('button');
+    closeButton.innerHTML = '×';
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '20px';
+    closeButton.style.right = '20px';
+    closeButton.style.backgroundColor = 'transparent';
+    closeButton.style.border = 'none';
+    closeButton.style.color = 'white';
+    closeButton.style.fontSize = '30px';
+    closeButton.style.cursor = 'pointer';
+    closeButton.onclick = () => document.body.removeChild(modal);
+    
+    // Create content
+    const content = document.createElement('div');
+    content.style.backgroundColor = 'white';
+    content.style.borderRadius = '12px';
+    content.style.width = '100%';
+    content.style.maxWidth = '350px';
+    content.style.padding = '20px';
+    content.style.textAlign = 'center';
+    
+    // Add installation steps
+    content.innerHTML = `
+      <h2 style="font-size: 20px; margin-bottom: 20px; color: #1a56db;">Install TikSave on iOS</h2>
+      <p style="margin-bottom: 10px; font-size: 15px;">1. Tap the <strong>Share</strong> button</p>
+      <p style="margin-bottom: 5px;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+          <polyline points="16 6 12 2 8 6"></polyline>
+          <line x1="12" y1="2" x2="12" y2="15"></line>
+        </svg>
+      </p>
+      <p style="margin-bottom: 15px; font-size: 15px;">2. Scroll down and tap <strong>Add to Home Screen</strong></p>
+      <p style="margin-bottom: 15px; font-size: 15px;">3. Tap <strong>Add</strong> in the top-right corner</p>
+      <button id="ios-close-button" style="background-color: #1a56db; color: white; border: none; padding: 12px 0; border-radius: 6px; font-weight: bold; width: 100%; margin-top: 10px; cursor: pointer;">Got it</button>
+    `;
+    
+    // Add elements to the DOM
+    modal.appendChild(closeButton);
+    modal.appendChild(content);
+    document.body.appendChild(modal);
+    
+    // Add event listener to the close button in content
+    document.getElementById('ios-close-button')?.addEventListener('click', () => {
+      document.body.removeChild(modal);
+    });
   };
   
-  const handleInstallClick = () => {
-    // Show more comprehensive instructions regardless of detected platform
-    const userAgent = navigator.userAgent.toLowerCase();
+  const showAndroidInstallDialog = () => {
+    // Force Android users to use Add to Home Screen
+    // Create a full-screen modal with clear instructions
+    const modal = document.createElement('div');
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.right = '0';
+    modal.style.bottom = '0';
+    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    modal.style.zIndex = '9999';
+    modal.style.display = 'flex';
+    modal.style.flexDirection = 'column';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+    modal.style.padding = '20px';
+    modal.style.fontFamily = 'system-ui, -apple-system, sans-serif';
     
-    if (/iphone|ipad|ipod/.test(userAgent)) {
-      // iOS-specific instructions
-      setShowIOSInstallGuide(true);
-    } else if (/android/.test(userAgent)) {
-      // Android-specific instructions
-      alert("Install on Android:\n\n1. Tap the menu button (⋮) in Chrome\n2. Select 'Add to Home screen'\n3. Confirm by tapping 'Add'");
-    } else if (/chrome/.test(userAgent)) {
-      // Chrome desktop instructions
-      alert("Install on Chrome:\n\n1. Look for the install icon (+) in the address bar\n2. Click 'Install'\n\nIf you don't see the icon, click the three dots menu (⋮) and select 'Install TikSave...'");
-    } else if (/firefox/.test(userAgent)) {
-      // Firefox instructions
-      alert("Install on Firefox:\n\n1. Click the three lines menu (≡)\n2. Select 'Add to Home Screen' or 'Install'");
-    } else if (/safari/.test(userAgent)) {
-      // Safari desktop instructions
-      alert("Install on Safari:\n\n1. Click the Share button\n2. Select 'Add to Home Screen'");
-    } else {
-      // Generic instructions for all other browsers
-      alert("To install this app:\n\n• Mobile: Look for 'Add to Home Screen' option in your browser menu\n• Desktop: Look for install icon in address bar or browser menu\n\nIf you need help, check your browser's instructions for installing web apps.");
-    }
+    // Create close button
+    const closeButton = document.createElement('button');
+    closeButton.innerHTML = '×';
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '20px';
+    closeButton.style.right = '20px';
+    closeButton.style.backgroundColor = 'transparent';
+    closeButton.style.border = 'none';
+    closeButton.style.color = 'white';
+    closeButton.style.fontSize = '30px';
+    closeButton.style.cursor = 'pointer';
+    closeButton.onclick = () => document.body.removeChild(modal);
+    
+    // Create content
+    const content = document.createElement('div');
+    content.style.backgroundColor = 'white';
+    content.style.borderRadius = '12px';
+    content.style.width = '100%';
+    content.style.maxWidth = '350px';
+    content.style.padding = '20px';
+    content.style.textAlign = 'center';
+    
+    // Add installation steps
+    content.innerHTML = `
+      <h2 style="font-size: 20px; margin-bottom: 20px; color: #1a56db;">Install TikSave on Android</h2>
+      <p style="margin-bottom: 15px; font-size: 15px;">1. Tap the menu button (⋮) in the top-right</p>
+      <p style="margin-bottom: 15px; font-size: 15px;">2. Tap <strong>Install app</strong> or <strong>Add to Home screen</strong></p>
+      <p style="margin-bottom: 15px; font-size: 15px;">3. Follow the on-screen instructions</p>
+      <button id="android-close-button" style="background-color: #1a56db; color: white; border: none; padding: 12px 0; border-radius: 6px; font-weight: bold; width: 100%; margin-top: 10px; cursor: pointer;">Got it</button>
+    `;
+    
+    // Add elements to the DOM
+    modal.appendChild(closeButton);
+    modal.appendChild(content);
+    document.body.appendChild(modal);
+    
+    // Add event listener to the close button in content
+    document.getElementById('android-close-button')?.addEventListener('click', () => {
+      document.body.removeChild(modal);
+    });
+  };
+  
+  const showGenericInstallDialog = () => {
+    // For other browsers, show a generic modal
+    const modal = document.createElement('div');
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.right = '0';
+    modal.style.bottom = '0';
+    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    modal.style.zIndex = '9999';
+    modal.style.display = 'flex';
+    modal.style.flexDirection = 'column';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+    modal.style.padding = '20px';
+    modal.style.fontFamily = 'system-ui, -apple-system, sans-serif';
+    
+    // Create close button
+    const closeButton = document.createElement('button');
+    closeButton.innerHTML = '×';
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '20px';
+    closeButton.style.right = '20px';
+    closeButton.style.backgroundColor = 'transparent';
+    closeButton.style.border = 'none';
+    closeButton.style.color = 'white';
+    closeButton.style.fontSize = '30px';
+    closeButton.style.cursor = 'pointer';
+    closeButton.onclick = () => document.body.removeChild(modal);
+    
+    // Create content
+    const content = document.createElement('div');
+    content.style.backgroundColor = 'white';
+    content.style.borderRadius = '12px';
+    content.style.width = '100%';
+    content.style.maxWidth = '350px';
+    content.style.padding = '20px';
+    content.style.textAlign = 'center';
+    
+    // Add installation steps
+    content.innerHTML = `
+      <h2 style="font-size: 20px; margin-bottom: 20px; color: #1a56db;">Install TikSave</h2>
+      <p style="margin-bottom: 15px; font-size: 15px;">Look for the install icon in your browser:</p>
+      <p style="margin-bottom: 15px; font-size: 15px;">• In Chrome/Edge: Look for + icon in the address bar</p>
+      <p style="margin-bottom: 15px; font-size: 15px;">• In Firefox/Safari: Find "Add to Home Screen" in the menu</p>
+      <button id="generic-close-button" style="background-color: #1a56db; color: white; border: none; padding: 12px 0; border-radius: 6px; font-weight: bold; width: 100%; margin-top: 10px; cursor: pointer;">Got it</button>
+    `;
+    
+    // Add elements to the DOM
+    modal.appendChild(closeButton);
+    modal.appendChild(content);
+    document.body.appendChild(modal);
+    
+    // Add event listener to the close button in content
+    document.getElementById('generic-close-button')?.addEventListener('click', () => {
+      document.body.removeChild(modal);
+    });
   };
 
   return (
-    <>
-      <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 mb-6">
-        <CardContent className="pt-6">
-          <div className="text-center mb-4">
-            <h3 className="text-xl font-bold text-blue-800 mb-2">Love TikSave?</h3>
-            <p className="text-slate-600">
-              Help us grow by sharing this tool with your friends and followers!
-            </p>
-          </div>
-          
-          {/* Direct Install Button using beforeinstallprompt event if available */}
-          <Button 
-            variant="default" 
-            className="w-full mb-4 bg-blue-600 hover:bg-blue-700"
-            onClick={() => {
-              // First try to use the deferredPrompt if available
-              if (window.deferredPrompt) {
-                window.deferredPrompt.prompt();
-                window.deferredPrompt.userChoice.then(choiceResult => {
-                  if (choiceResult.outcome === 'accepted') {
-                    console.log('User accepted the install prompt');
-                  }
-                  // Clear the prompt
-                  window.deferredPrompt = null;
-                });
-              } else {
-                // Otherwise use the fallback instructions
-                handleInstallClick();
-              }
-            }}
-          >
-            <Download className="mr-2 h-4 w-4" />
-            Install TikSave App
-          </Button>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-            {/* Web Share API (Mobile-friendly) */}
-            {typeof navigator !== 'undefined' && 'share' in navigator && (
-              <Button
-                variant="outline"
-                className="flex items-center justify-center gap-2 border-blue-400 text-blue-700 hover:bg-blue-50"
-                onClick={shareViaWebShare}
-              >
-                <Share2 size={18} />
-                Share This App
-              </Button>
-            )}
-
-            {/* Social Media Share Buttons */}
-            <Button
-              variant="outline"
-              className="flex items-center justify-center gap-2 border-blue-400 text-blue-600 hover:bg-blue-50"
-              onClick={shareViaTwitter}
-            >
-              <Twitter size={18} />
-              Share on Twitter
-            </Button>
-
-            <Button
-              variant="outline"
-              className="flex items-center justify-center gap-2 border-blue-400 text-blue-800 hover:bg-blue-50"
-              onClick={shareViaFacebook}
-            >
-              <Facebook size={18} />
-              Share on Facebook
-            </Button>
-          </div>
-
-          <p className="text-xs text-center text-slate-500 mt-4">
-            SamaBrains is a Uganda-based company providing innovative digital solutions.
-            <br />
-            Contact us: info@samabrains.com | +256759910596
+    <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 mb-6">
+      <CardContent className="pt-6">
+        <div className="text-center mb-4">
+          <h3 className="text-xl font-bold text-blue-800 mb-2">Install TikSave App</h3>
+          <p className="text-slate-600">
+            Get faster downloads and better experience by installing our app!
           </p>
-        </CardContent>
-      </Card>
-      
-      {/* iOS Installation Guide Modal */}
-      {showIOSInstallGuide && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-sm w-full p-6 shadow-xl">
-            <h3 className="text-lg font-bold mb-3">Install TikSave on iOS</h3>
-            
-            <ol className="space-y-3 mb-5">
-              <li className="flex items-start gap-2">
-                <span className="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
-                <div>
-                  <p className="font-medium">Tap the Share button</p>
-                  <div className="flex items-center mt-1">
-                    <Heart className="h-5 w-5 text-gray-600" />
-                  </div>
-                </div>
-              </li>
-              
-              <li className="flex items-start gap-2">
-                <span className="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
-                <div>
-                  <p className="font-medium">Select "Add to Home Screen"</p>
-                  <p className="text-sm text-gray-500 mt-1">Scroll down to find this option</p>
-                </div>
-              </li>
-              
-              <li className="flex items-start gap-2">
-                <span className="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
-                <p className="font-medium">Tap "Add" in the top right corner</p>
-              </li>
-            </ol>
-            
-            <Button 
-              className="w-full" 
-              onClick={() => setShowIOSInstallGuide(false)}
-            >
-              Got it
-            </Button>
-          </div>
         </div>
-      )}
-    </>
+        
+        {/* Direct Install Button */}
+        <Button 
+          variant="default" 
+          className="w-full mb-4 bg-blue-600 hover:bg-blue-700"
+          onClick={handleInstall}
+        >
+          <Download className="mr-2 h-4 w-4" />
+          Install TikSave App
+        </Button>
+
+        <p className="text-xs text-center text-slate-500 mt-4">
+          SamaBrains is a Uganda-based company providing innovative digital solutions.
+          <br />
+          Contact us: info@samabrains.com | +256759910596
+        </p>
+      </CardContent>
+    </Card>
   );
 }
