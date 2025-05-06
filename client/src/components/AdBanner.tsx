@@ -9,8 +9,8 @@ interface AdBannerProps {
 }
 
 export function AdBanner({
-  adClient = "ca-pub-xxxxxxxxxxxxxxxx", // Replace with your AdSense Publisher ID
-  adSlot = "xxxxxxxxxx", // Replace with your AdSense Ad Slot ID
+  adClient = "ca-pub-6859477325721314", // Your AdSense Publisher ID
+  adSlot = "xxxxxxxxxx", // Replace with your AdSense Ad Slot ID when available
   format = "auto",
   className = "",
   style = {},
