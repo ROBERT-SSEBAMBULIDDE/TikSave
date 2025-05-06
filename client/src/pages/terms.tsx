@@ -44,7 +44,7 @@ export default function Terms() {
             
             <h2 className="text-xl font-semibold mt-6 mb-3">5. Limitation of Liability</h2>
             <p>
-              SamaBrains TikTok Downloader provides the service on an "as is" and "as available" basis. We make no warranties, expressed or implied, regarding the reliability, accuracy, or availability of the service. In no event shall SamaBrains be liable for any indirect, incidental, special, or consequential damages arising out of or in any way connected with the use of our service.
+              TikSave provides the service on an "as is" and "as available" basis. We make no warranties, expressed or implied, regarding the reliability, accuracy, or availability of the service. In no event shall SamaBrains be liable for any indirect, incidental, special, or consequential damages arising out of or in any way connected with the use of our service.
             </p>
             
             <h2 className="text-xl font-semibold mt-6 mb-3">6. Service Modifications</h2>
