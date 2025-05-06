@@ -6,7 +6,6 @@ import { ErrorState } from "@/components/ErrorState";
 import { ToastNotification } from "@/components/ToastNotification";
 import { useTikTokDownloader } from "@/hooks/use-tiktok-downloader";
 import { FAIcon } from "@/components/ui/fa-icon";
-import { AdContainer } from "@/components/AdContainer";
 
 export function DownloaderCard() {
   const {
@@ -112,11 +111,6 @@ export function DownloaderCard() {
           )}
         </CardContent>
       </Card>
-      
-      {/* Ad placed after the main card */}
-      <div className="max-w-3xl mx-auto mt-6">
-        <AdContainer position="inline" className="py-2 px-4 bg-white rounded-lg shadow border border-gray-200" />
-      </div>
       
       <ToastNotification toast={toast} />
     </section>
