@@ -4,6 +4,7 @@ import { DownloaderCard } from "@/components/DownloaderCard";
 import { FAQSection } from "@/components/FAQSection";
 import { Footer } from "@/components/Footer";
 import { DownloadHistorySection } from "@/components/DownloadHistorySection";
+import { ShareAppCTA } from "@/components/ShareAppCTA";
 
 export default function Home() {
   return (
@@ -15,6 +16,7 @@ export default function Home() {
         <DownloaderCard />
         <div className="container max-w-6xl px-4 py-8">
           <DownloadHistorySection />
+          <ShareAppCTA />
         </div>
         <FAQSection />
       </main>
