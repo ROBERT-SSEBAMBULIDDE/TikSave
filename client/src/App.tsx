@@ -9,7 +9,7 @@ import Terms from "@/pages/terms";
 import Privacy from "@/pages/privacy";
 import HowItWorks from "@/pages/howitworks";
 import { ThemeProvider } from "./providers/ThemeProvider";
-import { DirectInstallButton } from "@/components/DirectInstallButton";
+import { MobileInstallPrompt } from "@/components/MobileInstallPrompt";
 
 function Router() {
   return (
@@ -31,7 +31,7 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <Router />
-          <DirectInstallButton />
+          <MobileInstallPrompt />
         </TooltipProvider>
       </QueryClientProvider>
     </ThemeProvider>
