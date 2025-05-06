@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Download, Info } from "lucide-react";
+import { Download, Share, Smartphone, Info } from "lucide-react";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -11,23 +11,53 @@ export function InstallAppButton() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstallable, setIsInstallable] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
+  const [isAndroid, setIsAndroid] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
   const [installStatus, setInstallStatus] = useState<string>("waiting");
+  const [showIOSInstructions, setShowIOSInstructions] = useState(false);
   const isDev = import.meta.env.DEV || window.location.hostname === "localhost";
 
   useEffect(() => {
-    // Check if on iOS
-    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    // Check if already installed as standalone
+    const isInStandaloneMode = () => 
+      window.matchMedia('(display-mode: standalone)').matches || 
+      (window.navigator as any).standalone || 
+      document.referrer.includes('android-app://');
+    
+    setIsStandalone(isInStandaloneMode());
+    
+    if (isInStandaloneMode()) {
+      console.log('App is running in standalone mode');
+      setInstallStatus("already-installed");
+      return; // Don't show install button if already installed
+    }
+
+    // Detect platform
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isIOSDevice = /iphone|ipad|ipod/.test(userAgent) && !(window as any).MSStream;
+    const isAndroidDevice = /android/.test(userAgent);
+    const isMobileDevice = isIOSDevice || isAndroidDevice || /mobi/i.test(userAgent);
+    
     setIsIOS(isIOSDevice);
+    setIsAndroid(isAndroidDevice);
+    setIsMobile(isMobileDevice);
+    
+    if (isIOSDevice) {
+      setInstallStatus("ios-detected");
+    } else if (isAndroidDevice) {
+      setInstallStatus("android-detected");
+    }
 
     // Check if service worker is registered
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistrations().then(registrations => {
         if (registrations.length > 0) {
           console.log('Service Worker is registered:', registrations);
-          setInstallStatus("service-worker-registered");
+          setInstallStatus(prev => prev + ";service-worker-registered");
         } else {
           console.log('No Service Worker registrations found');
-          setInstallStatus("no-service-worker");
+          setInstallStatus(prev => prev + ";no-service-worker");
         }
       });
     }
@@ -40,7 +70,7 @@ export function InstallAppButton() {
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       // Update UI to show the install button
       setIsInstallable(true);
-      setInstallStatus("installable");
+      setInstallStatus(prev => prev + ";installable");
       console.log("App is installable! The beforeinstallprompt event fired.");
     };
 
@@ -63,29 +93,45 @@ export function InstallAppButton() {
   }, []);
 
   const handleInstallClick = async () => {
-    if (!deferredPrompt) return;
+    if (deferredPrompt) {
+      // For Android/Chrome
+      try {
+        // Show the install prompt
+        deferredPrompt.prompt();
 
-    // Show the install prompt
-    deferredPrompt.prompt();
-
-    // Wait for the user to respond to the prompt
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    // We've used the prompt, and can't use it again, discard it
-    setDeferredPrompt(null);
-    
-    if (outcome === "accepted") {
-      console.log("User accepted the install prompt");
-      setIsInstallable(false);
-      setInstallStatus("installing");
-    } else {
-      console.log("User dismissed the install prompt");
-      setInstallStatus("dismissed");
+        // Wait for the user to respond to the prompt
+        const { outcome } = await deferredPrompt.userChoice;
+        
+        // We've used the prompt, and can't use it again, discard it
+        setDeferredPrompt(null);
+        
+        if (outcome === "accepted") {
+          console.log("User accepted the install prompt");
+          setIsInstallable(false);
+          setInstallStatus("installing");
+        } else {
+          console.log("User dismissed the install prompt");
+          setInstallStatus("dismissed");
+        }
+      } catch (error) {
+        console.error("Error during installation:", error);
+        setInstallStatus("error-installing");
+      }
+    } else if (isIOS) {
+      // For iOS, show detailed instructions
+      setShowIOSInstructions(true);
+    } else if (isAndroid) {
+      // Fallback for Android if beforeinstallprompt didn't fire
+      alert("To install this app, open it in Chrome and tap the menu button, then tap 'Add to Home screen'");
     }
   };
 
-  // Always show in dev mode for testing purposes
-  const shouldShow = isInstallable || isIOS || isDev;
+  // Show installation UI if:
+  // - Browser supports installation (isInstallable)
+  // - OR we're on iOS 
+  // - OR we're in dev mode
+  // - AND NOT already installed
+  const shouldShow = (isInstallable || isIOS || isAndroid || isDev) && !isStandalone;
   
   if (!shouldShow) return null;
 
@@ -94,42 +140,84 @@ export function InstallAppButton() {
       {isInstallable && (
         <Button 
           onClick={handleInstallClick} 
-          className="bg-blue-700 hover:bg-blue-800 text-white shadow-lg"
+          className="bg-blue-700 hover:bg-blue-800 text-white shadow-lg flex items-center"
+          size="lg"
         >
-          <Download className="mr-2 h-4 w-4" />
+          <Download className="mr-2 h-5 w-5" />
           Install App
         </Button>
       )}
       
-      {isDev && !isInstallable && (
-        <div className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-xl border border-gray-200 dark:border-slate-700 max-w-xs">
+      {!isInstallable && (isMobile || isDev) && (
+        <Button 
+          onClick={handleInstallClick} 
+          className="bg-blue-700 hover:bg-blue-800 text-white shadow-lg flex items-center"
+          size="lg"
+        >
+          <Smartphone className="mr-2 h-5 w-5" />
+          Install TikSave
+        </Button>
+      )}
+      
+      {isDev && (
+        <div className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-xl border border-gray-200 dark:border-slate-700 max-w-xs mt-3">
           <div className="flex items-start gap-2">
             <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
             <div>
               <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                PWA Install Status: {installStatus}
+                PWA Status: {installStatus}
               </p>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                This debug info only appears in development. The install button will appear when all criteria are met.
+                Mobile: {isMobile ? "Yes" : "No"}, 
+                iOS: {isIOS ? "Yes" : "No"}, 
+                Android: {isAndroid ? "Yes" : "No"}
               </p>
             </div>
           </div>
         </div>
       )}
       
-      {isIOS && !isInstallable && (
-        <div className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-xl border border-gray-200 dark:border-slate-700 max-w-xs">
-          <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
-            Install TikSave on your iOS device:
-            <span className="block mt-1 text-xs text-slate-500 dark:text-slate-400">
-              Tap <span className="inline-block">
-                <svg xmlns="http://www.w3.org/2000/svg" className="inline h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                  <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
-                </svg>
-              </span> and then "Add to Home Screen"
-            </span>
-          </p>
+      {showIOSInstructions && isIOS && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-2xl max-w-md w-full">
+            <h3 className="text-xl font-bold mb-3 text-slate-900 dark:text-white">Install TikSave on iOS</h3>
+            
+            <ol className="space-y-4 mb-4">
+              <li className="flex items-start gap-2">
+                <span className="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
+                <div>
+                  <p className="text-slate-700 dark:text-slate-300">Tap the Share button in Safari</p>
+                  <div className="mt-1">
+                    <Share className="h-6 w-6 text-slate-700 dark:text-slate-300" />
+                  </div>
+                </div>
+              </li>
+              
+              <li className="flex items-start gap-2">
+                <span className="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
+                <div>
+                  <p className="text-slate-700 dark:text-slate-300">Scroll down and tap "Add to Home Screen"</p>
+                  <div className="mt-1 p-2 border border-slate-200 dark:border-slate-700 rounded bg-slate-50 dark:bg-slate-900 text-sm">
+                    Add to Home Screen
+                  </div>
+                </div>
+              </li>
+              
+              <li className="flex items-start gap-2">
+                <span className="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
+                <p className="text-slate-700 dark:text-slate-300">Tap "Add" in the top-right corner</p>
+              </li>
+            </ol>
+            
+            <div className="flex justify-end">
+              <Button 
+                onClick={() => setShowIOSInstructions(false)}
+                variant="outline"
+              >
+                Close
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </div>
