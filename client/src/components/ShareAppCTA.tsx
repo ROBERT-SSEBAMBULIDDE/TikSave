@@ -40,7 +40,7 @@ export function ShareAppCTA() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
           {/* Web Share API (Mobile-friendly) */}
-          {navigator && navigator.share && (
+          {typeof navigator !== 'undefined' && 'share' in navigator && (
             <Button
               variant="outline"
               className="flex items-center justify-center gap-2 border-blue-400 text-blue-700 hover:bg-blue-50"
