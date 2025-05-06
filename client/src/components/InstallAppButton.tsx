@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Download, Info } from "lucide-react";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -11,11 +11,26 @@ export function InstallAppButton() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstallable, setIsInstallable] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
+  const [installStatus, setInstallStatus] = useState<string>("waiting");
+  const isDev = import.meta.env.DEV || window.location.hostname === "localhost";
 
   useEffect(() => {
     // Check if on iOS
     const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
     setIsIOS(isIOSDevice);
+
+    // Check if service worker is registered
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        if (registrations.length > 0) {
+          console.log('Service Worker is registered:', registrations);
+          setInstallStatus("service-worker-registered");
+        } else {
+          console.log('No Service Worker registrations found');
+          setInstallStatus("no-service-worker");
+        }
+      });
+    }
 
     // Listen for the beforeinstallprompt event
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -25,6 +40,8 @@ export function InstallAppButton() {
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       // Update UI to show the install button
       setIsInstallable(true);
+      setInstallStatus("installable");
+      console.log("App is installable! The beforeinstallprompt event fired.");
     };
 
     // Check if app is already installed
@@ -32,6 +49,7 @@ export function InstallAppButton() {
       // Hide the install button when installed
       setIsInstallable(false);
       setDeferredPrompt(null);
+      setInstallStatus("installed");
       console.log("TikSave app was installed");
     };
 
@@ -59,12 +77,17 @@ export function InstallAppButton() {
     if (outcome === "accepted") {
       console.log("User accepted the install prompt");
       setIsInstallable(false);
+      setInstallStatus("installing");
     } else {
       console.log("User dismissed the install prompt");
+      setInstallStatus("dismissed");
     }
   };
 
-  if (!isInstallable && !isIOS) return null;
+  // Always show in dev mode for testing purposes
+  const shouldShow = isInstallable || isIOS || isDev;
+  
+  if (!shouldShow) return null;
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
@@ -78,11 +101,27 @@ export function InstallAppButton() {
         </Button>
       )}
       
+      {isDev && !isInstallable && (
+        <div className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-xl border border-gray-200 dark:border-slate-700 max-w-xs">
+          <div className="flex items-start gap-2">
+            <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                PWA Install Status: {installStatus}
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                This debug info only appears in development. The install button will appear when all criteria are met.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {isIOS && !isInstallable && (
-        <div className="bg-white p-3 rounded-lg shadow-xl border border-gray-200 max-w-xs">
-          <p className="text-sm font-medium">
+        <div className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-xl border border-gray-200 dark:border-slate-700 max-w-xs">
+          <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
             Install TikSave on your iOS device:
-            <span className="block mt-1 text-xs text-gray-600">
+            <span className="block mt-1 text-xs text-slate-500 dark:text-slate-400">
               Tap <span className="inline-block">
                 <svg xmlns="http://www.w3.org/2000/svg" className="inline h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
