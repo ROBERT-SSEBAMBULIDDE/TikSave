@@ -217,7 +217,7 @@ export function ResultsState({
               onClick={() => {
                 if (navigator.share) {
                   navigator.share({
-                    title: "SamaBrains TikTok Downloader",
+                    title: "TikSave",
                     text: "Download TikTok videos without watermark using this amazing tool!",
                     url: window.location.origin
                   }).catch(err => console.error('Error sharing:', err));

@@ -14,9 +14,9 @@ function HowItWorks() {
           
           <Card className="mb-8">
             <CardContent className="pt-6">
-              <h2 className="text-2xl font-semibold mb-4 text-blue-700">Using Our TikTok Downloader</h2>
+              <h2 className="text-2xl font-semibold mb-4 text-blue-700">Using TikSave</h2>
               <p className="text-slate-700 mb-6">
-                SamaBrains TikTok Downloader is a simple, fast, and reliable tool for downloading
+                TikSave is a simple, fast, and reliable tool by SamaBrains for downloading
                 TikTok videos without watermarks. Here is how to use it in a few easy steps:
               </p>
               
@@ -41,9 +41,9 @@ function HowItWorks() {
                     <span className="text-xl font-bold">2</span>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold mb-2">Paste the URL into Our Downloader</h3>
+                    <h3 className="text-xl font-semibold mb-2">Paste the URL into TikSave</h3>
                     <p className="text-slate-600">
-                      Come back to SamaBrains TikTok Downloader and paste the copied URL into the input field. 
+                      Come back to TikSave and paste the copied URL into the input field. 
                       Our system will automatically validate the URL and process the video information.
                     </p>
                   </div>

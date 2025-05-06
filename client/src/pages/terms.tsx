@@ -12,17 +12,17 @@ export default function Terms() {
           
           <div className="prose prose-slate max-w-none">
             <p className="mb-4">
-              Welcome to SamaBrains TikTok Downloader. By using our service, you agree to comply with and be bound by the following terms and conditions.
+              Welcome to TikSave by SamaBrains. By using our service, you agree to comply with and be bound by the following terms and conditions.
             </p>
             
             <h2 className="text-xl font-semibold mt-6 mb-3">1. Acceptance of Terms</h2>
             <p>
-              By accessing or using the SamaBrains TikTok Downloader service, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our service.
+              By accessing or using the TikSave service, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our service.
             </p>
             
             <h2 className="text-xl font-semibold mt-6 mb-3">2. Description of Service</h2>
             <p>
-              SamaBrains TikTok Downloader provides a service that allows users to download TikTok videos without watermarks for personal use only. The service processes publicly available TikTok videos and provides them in various formats.
+              TikSave provides a service that allows users to download TikTok videos without watermarks for personal use only. The service processes publicly available TikTok videos and provides them in various formats.
             </p>
             
             <h2 className="text-xl font-semibold mt-6 mb-3">3. User Responsibilities</h2>

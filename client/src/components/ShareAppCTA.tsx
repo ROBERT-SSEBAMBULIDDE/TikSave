@@ -5,8 +5,8 @@ import { Share2, Twitter, Facebook } from "lucide-react";
 
 export function ShareAppCTA() {
   const shareUrl = window.location.origin;
-  const shareTitle = "SamaBrains TikTok Downloader - Download TikTok Videos Without Watermark";
-  const shareText = "I'm using this amazing TikTok downloader to save videos without watermarks. Check it out!";
+  const shareTitle = "TikSave - Download TikTok Videos Without Watermark";
+  const shareText = "I'm using TikSave to download TikTok videos without watermarks. It's fast and free. Check it out!";
 
   const shareViaWebShare = () => {
     if (navigator.share) {
@@ -32,7 +32,7 @@ export function ShareAppCTA() {
     <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 mb-6">
       <CardContent className="pt-6">
         <div className="text-center mb-4">
-          <h3 className="text-xl font-bold text-blue-800 mb-2">Love Our TikTok Downloader?</h3>
+          <h3 className="text-xl font-bold text-blue-800 mb-2">Love TikSave?</h3>
           <p className="text-slate-600">
             Help us grow by sharing this tool with your friends and followers!
           </p>
