@@ -1,9 +1,10 @@
 // Service Worker for TikSave PWA
 
-const CACHE_NAME = 'tiksave-v2';
+const CACHE_NAME = 'tiksave-v3';
 const urlsToCache = [
   '/',
   '/index.html',
+  '/offline.html',
   '/manifest.json',
   '/icons/app-icon.svg',
   '/icons/icon-192x192.png',
@@ -72,8 +73,8 @@ self.addEventListener('fetch', event => {
               return response;
             })
             .catch(() => {
-              // If network fails, try to return any offline page or fallback
-              return caches.match('/');
+              // If network fails, return the offline page
+              return caches.match('/offline.html');
             });
         }
         
@@ -94,6 +95,27 @@ self.addEventListener('fetch', event => {
               });
               
             return response;
+          })
+          .catch(error => {
+            console.error('Fetch failed:', error);
+            
+            // For API requests that fail, return a JSON error
+            if (event.request.url.includes('/api/')) {
+              return new Response(
+                JSON.stringify({ 
+                  error: 'You are offline. Please reconnect to the internet to use this feature.' 
+                }),
+                { 
+                  status: 503,
+                  headers: { 'Content-Type': 'application/json' }
+                }
+              );
+            }
+            
+            // For image requests, try to return a placeholder if available
+            if (event.request.destination === 'image') {
+              return caches.match('/icons/app-icon.svg');
+            }
           });
       })
   );
