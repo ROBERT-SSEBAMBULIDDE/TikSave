@@ -2,6 +2,7 @@ import React from 'react';
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
+import { AdUnit } from "@/components/AdUnit";
 
 export default function HowItWorks() {
   return (
@@ -11,6 +12,9 @@ export default function HowItWorks() {
       <main className="flex-grow bg-slate-50 dark:bg-gray-900">
         <div className="container max-w-4xl mx-auto px-4 py-8">
           <h1 className="text-3xl font-bold text-center mb-8 text-blue-800 dark:text-blue-400">How It Works</h1>
+          
+          {/* Rectangle ad format for top of page */}
+          <AdUnit format="rectangle" className="mb-8" />
           
           <Card className="mb-8">
             <CardContent className="pt-6">
@@ -127,7 +131,7 @@ export default function HowItWorks() {
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="mb-8">
             <CardContent className="pt-6">
               <h2 className="text-2xl font-semibold mb-4 text-blue-700 dark:text-blue-400">Tips for Best Results</h2>
               
@@ -150,6 +154,9 @@ export default function HowItWorks() {
               </ul>
             </CardContent>
           </Card>
+          
+          {/* Horizontal ad format for bottom of page */}
+          <AdUnit format="horizontal" />
         </div>
       </main>
       

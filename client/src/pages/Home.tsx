@@ -16,12 +16,12 @@ export default function Home() {
         <HeroSection />
         <DownloaderCard />
         <div className="container max-w-6xl px-4 py-8">
-          {/* First Ad Unit */}
-          <AdUnit />
+          {/* First Ad Unit - Fluid format for article-style ads */}
+          <AdUnit format="fluid" className="md:px-4" />
           <DownloadHistorySection />
           <ShareAppCTA />
-          {/* Second Ad Unit */}
-          <AdUnit />
+          {/* Second Ad Unit - Horizontal format for banner-style ads */}
+          <AdUnit format="horizontal" className="md:px-4" />
         </div>
         <FAQSection />
       </main>
