@@ -7,6 +7,7 @@ import { DownloadHistorySection } from "@/components/DownloadHistorySection";
 import { ShareAppCTA } from "@/components/ShareAppCTA";
 import { FirstTimeWelcome } from "@/components/FirstTimeWelcome";
 import { AdPlacement } from "@/components/AdPlacement";
+import { InArticleAd } from "@/components/InArticleAd";
 
 export default function Home() {
   return (
@@ -24,8 +25,8 @@ export default function Home() {
         <DownloaderCard />
         
         <div className="container max-w-6xl px-4 py-8">
-          {/* Ad placement between components */}
-          <AdPlacement location="inline" />
+          {/* In-article ad placement with the exact user-provided code */}
+          <InArticleAd />
           
           <DownloadHistorySection />
           
@@ -33,6 +34,9 @@ export default function Home() {
           <AdPlacement location="inline" />
           
           <ShareAppCTA />
+          
+          {/* Second in-article ad for better visibility */}
+          <InArticleAd className="mt-12" />
         </div>
         
         <FAQSection />
