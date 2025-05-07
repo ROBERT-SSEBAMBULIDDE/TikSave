@@ -14,6 +14,13 @@ import {
   shouldShowAd
 } from '@/lib/adOptimizer';
 
+// Helper to detect if app is running as PWA
+function isPWA(): boolean {
+  return window.matchMedia('(display-mode: standalone)').matches || 
+    (window.navigator as any).standalone || 
+    document.referrer.includes('android-app://');
+}
+
 // Context state type
 interface AdOptimizerContextState {
   deviceType: DeviceType;
@@ -23,6 +30,7 @@ interface AdOptimizerContextState {
   scrollDepth: number;
   isAdBlockerDetected: boolean;
   adsViewed: number;
+  isInPWAMode: boolean;
   optimizeAd: (placementId: string) => { 
     format: AdFormat; 
     slot: string;
@@ -40,6 +48,7 @@ const AdOptimizerContext = createContext<AdOptimizerContextState>({
   scrollDepth: 0,
   isAdBlockerDetected: false,
   adsViewed: 0,
+  isInPWAMode: false,
   optimizeAd: () => ({ format: 'auto', slot: '6862860274', show: true }),
   recordAdImpression: () => {}
 });
@@ -59,10 +68,25 @@ export function AdOptimizerProvider({ children }: AdOptimizerProviderProps) {
   const [scrollDepth, setScrollDepth] = useState(0);
   const [isAdBlockerDetected, setIsAdBlockerDetected] = useState(false);
   const [adsViewed, setAdsViewed] = useState(0);
+  const [isInPWAMode, setIsInPWAMode] = useState(false);
   
   // Record page entry time
   useEffect(() => {
     resetPageEntryTime();
+  }, []);
+  
+  // Detect if app is running in PWA mode
+  useEffect(() => {
+    setIsInPWAMode(isPWA());
+    
+    // Also listen for display mode changes
+    const mediaQuery = window.matchMedia('(display-mode: standalone)');
+    const handleChange = (e: MediaQueryListEvent) => {
+      setIsInPWAMode(e.matches || (window.navigator as any).standalone || false);
+    };
+    
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
   
   // Update context when location changes
@@ -174,6 +198,7 @@ export function AdOptimizerProvider({ children }: AdOptimizerProviderProps) {
     scrollDepth,
     isAdBlockerDetected,
     adsViewed,
+    isInPWAMode,
     optimizeAd,
     recordAdImpression
   };

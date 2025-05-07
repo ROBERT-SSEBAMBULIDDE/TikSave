@@ -57,6 +57,12 @@ self.addEventListener('message', (event) => {
 
 // Serve cached content when offline
 self.addEventListener('fetch', event => {
+  // Check if the request is for an ad-related resource
+  // Don't cache ad resources to ensure they refresh properly
+  if (isAdResource(event.request.url)) {
+    return; // Let browser handle ad requests normally
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then(response => {
@@ -135,3 +141,19 @@ self.addEventListener('fetch', event => {
       })
   );
 });
+
+// Helper function to identify ad-related resources
+function isAdResource(url) {
+  // List of ad-related domains or paths to bypass caching
+  const adPatterns = [
+    'googleads',
+    'googlesyndication',
+    'doubleclick.net',
+    'adservice',
+    'pagead',
+    'adsense',
+    'adsbygoogle',
+  ];
+  
+  return adPatterns.some(pattern => url.includes(pattern));
+}
