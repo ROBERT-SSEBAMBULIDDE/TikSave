@@ -55,6 +55,39 @@ self.addEventListener('message', (event) => {
   }
 });
 
+// Handle the dedicated cleanup of cached ad content
+self.addEventListener('activate', event => {
+  console.log('Service worker activated. Cleaning up ad-related cache entries...');
+  
+  // After activation, clean up any potentially cached advertisement content
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.keys().then(requests => {
+        return Promise.all(
+          requests.filter(request => {
+            const url = request.url.toLowerCase();
+            const adPatterns = [
+              'googleads', 
+              'doubleclick', 
+              'adsense', 
+              'adservice', 
+              'analytics', 
+              'pagead', 
+              'adsbygoogle',
+              'ad-', 
+              '/ads/',
+              'advertisement'
+            ];
+            return adPatterns.some(pattern => url.includes(pattern));
+          }).map(request => {
+            return cache.delete(request);
+          })
+        );
+      });
+    })
+  );
+});
+
 // Serve cached content when offline
 self.addEventListener('fetch', event => {
   // Block ad requests
