@@ -45,6 +45,13 @@ export function Header() {
   
   return (
     <header className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-md dark:from-gray-800 dark:to-gray-900">
+      {/* Header ad banner */}
+      <div className="w-full bg-slate-50">
+        <div className="max-w-5xl mx-auto">
+          <AdPlacement location="header" />
+        </div>
+      </div>
+
       <div className="max-w-5xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
         <Link href="/">
           <div className="flex items-center space-x-2 cursor-pointer">

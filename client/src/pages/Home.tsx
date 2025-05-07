@@ -5,7 +5,6 @@ import { FAQSection } from "@/components/FAQSection";
 import { Footer } from "@/components/Footer";
 import { DownloadHistorySection } from "@/components/DownloadHistorySection";
 import { ShareAppCTA } from "@/components/ShareAppCTA";
-import { FirstTimeWelcome } from "@/components/FirstTimeWelcome";
 import { AdPlacement } from "@/components/AdPlacement";
 
 export default function Home() {
@@ -44,9 +43,6 @@ export default function Home() {
       </main>
       
       <Footer />
-      
-      {/* First-time user welcome/tooltip guide */}
-      <FirstTimeWelcome />
     </div>
   );
 }
