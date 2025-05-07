@@ -5,6 +5,7 @@ import { FAQSection } from "@/components/FAQSection";
 import { Footer } from "@/components/Footer";
 import { DownloadHistorySection } from "@/components/DownloadHistorySection";
 import { ShareAppCTA } from "@/components/ShareAppCTA";
+import { AdUnit } from "@/components/AdUnit";
 
 export default function Home() {
   return (
@@ -15,8 +16,12 @@ export default function Home() {
         <HeroSection />
         <DownloaderCard />
         <div className="container max-w-6xl px-4 py-8">
+          {/* First Ad Unit */}
+          <AdUnit />
           <DownloadHistorySection />
           <ShareAppCTA />
+          {/* Second Ad Unit */}
+          <AdUnit />
         </div>
         <FAQSection />
       </main>
