@@ -2,6 +2,7 @@ import { FAIcon } from "@/components/ui/fa-icon";
 import { Link } from "wouter";
 import { ThemeToggle } from "./ThemeToggle";
 import { PWAInstallModal } from "./PWAInstallModal";
+import { ShareApp } from "./ShareApp";
 import { useState, useEffect } from "react";
 
 export function Header() {
@@ -77,6 +78,11 @@ export function Header() {
               </li>
             </ul>
           </nav>
+          
+          {/* Share App button */}
+          <div className="hidden sm:block mr-3">
+            <ShareApp />
+          </div>
           
           {/* Only show install button if not already in standalone mode */}
           {!isStandalone && (

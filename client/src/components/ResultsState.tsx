@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { FAIcon } from "@/components/ui/fa-icon";
 import { VideoData, DownloadFormat, VideoQuality } from "@/lib/types";
 import { useState, useRef, useEffect } from "react";
+import { ShareApp } from "./ShareApp";
 
 interface ResultsStateProps {
   videoData: VideoData;
@@ -213,25 +214,7 @@ export function ResultsState({
         <div className="mt-6 pt-6 border-t border-slate-200">
           <h3 className="text-lg font-semibold text-center mb-3">Loved this tool?</h3>
           <div className="flex flex-wrap gap-2 justify-center">
-            <button 
-              onClick={() => {
-                if (navigator.share) {
-                  navigator.share({
-                    title: "TikSave",
-                    text: "Download TikTok videos without watermark using this amazing tool!",
-                    url: window.location.origin
-                  }).catch(err => console.error('Error sharing:', err));
-                } else {
-                  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent("Download TikTok videos without watermark using this amazing tool!")}&url=${encodeURIComponent(window.location.origin)}`, '_blank');
-                }
-              }}
-              className="inline-flex items-center rounded-md px-3 py-2 text-sm font-medium bg-blue-50 text-blue-700 hover:bg-blue-100"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-              </svg>
-              Share This Tool
-            </button>
+            <ShareApp />
           </div>
         </div>
       </div>
