@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { FAIcon } from "@/components/ui/fa-icon";
 import { useState } from "react";
 import { DownloadFormat, VideoQuality } from "@/lib/types";
+import { ContextualTooltip } from "./ContextualTooltip";
 
 interface DownloaderFormProps {
   url: string;
@@ -43,9 +44,15 @@ export function DownloaderForm({ url, onUrlChange, onSubmit }: DownloaderFormPro
   return (
     <form onSubmit={onSubmit}>
       <div>
-        <label htmlFor="tiktok-url" className="block text-sm font-medium text-slate-700 mb-2">
-          Enter TikTok Video URL
-        </label>
+        <ContextualTooltip
+          id="url-input-tooltip"
+          content="Paste a TikTok video URL here. You can copy it from the TikTok app or website by sharing the video and copying the link."
+          side="top"
+        >
+          <label htmlFor="tiktok-url" className="block text-sm font-medium text-slate-700 mb-2">
+            Enter TikTok Video URL <FAIcon icon="question-circle" className="text-xs text-blue-500 ml-1" />
+          </label>
+        </ContextualTooltip>
         
         <div className="flex rounded-md shadow-lg">
           <div className="flex items-center pl-3 pr-1 bg-slate-50 border border-r-0 border-slate-200 rounded-l-md">
@@ -74,7 +81,15 @@ export function DownloaderForm({ url, onUrlChange, onSubmit }: DownloaderFormPro
         {showFormatOptions && (
           <div className="mt-4 p-4 bg-slate-50 border border-slate-200 rounded-md">
             <div className="mb-3">
-              <h4 className="text-sm font-medium mb-2 text-slate-700">Select Format</h4>
+              <ContextualTooltip
+                id="format-selection-tooltip"
+                content="Choose the format you want to download. MP4 is best for videos, MP3 for audio only, and WebM for higher compression."
+                side="right"
+              >
+                <h4 className="text-sm font-medium mb-2 text-slate-700 inline-flex items-center">
+                  Select Format <FAIcon icon="question-circle" className="text-xs text-blue-500 ml-1" />
+                </h4>
+              </ContextualTooltip>
               <div className="flex flex-wrap gap-2">
                 <Button 
                   type="button"
@@ -107,7 +122,15 @@ export function DownloaderForm({ url, onUrlChange, onSubmit }: DownloaderFormPro
             {/* Quality options (not shown for MP3) */}
             {selectedFormat !== "mp3" && (
               <div>
-                <h4 className="text-sm font-medium mb-2 text-slate-700">Select Quality</h4>
+                <ContextualTooltip
+                  id="quality-selection-tooltip"
+                  content="Choose quality level. Higher quality means better resolution but larger file size. Low quality is faster to download."
+                  side="right"
+                >
+                  <h4 className="text-sm font-medium mb-2 text-slate-700 inline-flex items-center">
+                    Select Quality <FAIcon icon="question-circle" className="text-xs text-blue-500 ml-1" />
+                  </h4>
+                </ContextualTooltip>
                 <div className="flex flex-wrap gap-2">
                   <Button
                     type="button"
