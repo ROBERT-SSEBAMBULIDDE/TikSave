@@ -2,7 +2,6 @@ import React from 'react';
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
-import { InArticleAd } from "@/components/InArticleAd";
 
 export default function HowItWorks() {
   return (
@@ -12,9 +11,6 @@ export default function HowItWorks() {
       <main className="flex-grow bg-slate-50 dark:bg-gray-900">
         <div className="container max-w-4xl mx-auto px-4 py-8">
           <h1 className="text-3xl font-bold text-center mb-8 text-blue-800 dark:text-blue-400">How It Works</h1>
-          
-          {/* First ad placement at the top of the content */}
-          <InArticleAd className="mb-8" />
           
           <Card className="mb-8">
             <CardContent className="pt-6">
@@ -67,9 +63,6 @@ export default function HowItWorks() {
                   </div>
                 </div>
                 
-                {/* Second ad placement in the middle of the steps */}
-                <InArticleAd />
-                
                 {/* Step 4 */}
                 <div className="flex">
                   <div className="flex-shrink-0 inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600 mr-4 dark:bg-blue-900 dark:text-blue-300">
@@ -118,9 +111,6 @@ export default function HowItWorks() {
                   </div>
                 </div>
                 
-                {/* Third ad placement before the last section */}
-                <InArticleAd />
-                
                 <div className="flex items-start">
                   <div className="flex-shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600 mr-3 dark:bg-blue-900 dark:text-blue-300">
                     <span className="text-lg">⚡</span>
@@ -160,9 +150,6 @@ export default function HowItWorks() {
               </ul>
             </CardContent>
           </Card>
-          
-          {/* Fourth ad placement at the end of the content */}
-          <InArticleAd className="mt-8" />
         </div>
       </main>
       

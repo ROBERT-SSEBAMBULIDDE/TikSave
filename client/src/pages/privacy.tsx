@@ -1,6 +1,5 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { InArticleAd } from "@/components/InArticleAd";
 
 export default function Privacy() {
   return (
@@ -9,9 +8,6 @@ export default function Privacy() {
       
       <main className="flex-grow bg-slate-50 dark:bg-gray-900 py-12 px-4">
         <div className="max-w-3xl mx-auto">
-          {/* Ad at the top of the page */}
-          <InArticleAd className="mb-8" />
-          
           <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-sm">
             <h1 className="text-3xl font-bold mb-6 text-slate-800 dark:text-slate-100">Privacy Policy</h1>
             
@@ -29,11 +25,6 @@ export default function Privacy() {
                 <li><strong>Cookies and Similar Technologies:</strong> We use cookies and similar tracking technologies to track activity on our service and store certain information.</li>
               </ul>
               
-              {/* Ad in the middle of the content */}
-              <div className="my-8">
-                <InArticleAd />
-              </div>
-              
               <h2 className="text-xl font-semibold mt-6 mb-3">2. How We Use Your Information</h2>
               <p>
                 We use the information we collect for various purposes, including:
@@ -44,7 +35,6 @@ export default function Privacy() {
                 <li>To allow you to participate in interactive features when you choose to do so</li>
                 <li>To monitor the usage of our service</li>
                 <li>To detect, prevent, and address technical issues</li>
-                <li>To deliver relevant advertisements to you</li>
               </ul>
               
               <h2 className="text-xl font-semibold mt-6 mb-3">3. Data Storage and Security</h2>
@@ -57,27 +47,17 @@ export default function Privacy() {
                 We may employ third-party companies and individuals to facilitate our service, provide the service on our behalf, perform service-related services, or assist us in analyzing how our service is used. These third parties have access to your information only to perform these tasks on our behalf and are obligated not to disclose or use it for any other purpose.
               </p>
               
-              {/* Another ad in the middle of the content */}
-              <div className="my-8">
-                <InArticleAd />
-              </div>
-              
-              <h2 className="text-xl font-semibold mt-6 mb-3">5. Advertising</h2>
-              <p>
-                We use Google AdSense to serve advertisements on our website. Google AdSense may use cookies and web beacons to collect information about your visits to this and other websites to provide personalized advertisements about goods and services that may interest you. If you would like more information about this practice and to know your choices about not having this information used by Google AdSense, please visit Google's privacy policy.
-              </p>
-              
-              <h2 className="text-xl font-semibold mt-6 mb-3">6. Children's Privacy</h2>
+              <h2 className="text-xl font-semibold mt-6 mb-3">5. Children's Privacy</h2>
               <p>
                 Our service does not address anyone under the age of 13. We do not knowingly collect personally identifiable information from children under 13. If you are a parent or guardian and you are aware that your child has provided us with personal data, please contact us.
               </p>
               
-              <h2 className="text-xl font-semibold mt-6 mb-3">7. Changes to This Privacy Policy</h2>
+              <h2 className="text-xl font-semibold mt-6 mb-3">6. Changes to This Privacy Policy</h2>
               <p>
                 We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page. You are advised to review this Privacy Policy periodically for any changes.
               </p>
               
-              <h2 className="text-xl font-semibold mt-6 mb-3">8. Contact Us</h2>
+              <h2 className="text-xl font-semibold mt-6 mb-3">7. Contact Us</h2>
               <p>
                 If you have any questions about this Privacy Policy, please contact us:
               </p>
@@ -92,9 +72,6 @@ export default function Privacy() {
               </p>
             </div>
           </div>
-          
-          {/* Ad at the bottom of the page */}
-          <InArticleAd className="mt-8" />
         </div>
       </main>
       

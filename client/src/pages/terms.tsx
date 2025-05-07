@@ -1,6 +1,5 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { InArticleAd } from "@/components/InArticleAd";
 
 export default function Terms() {
   return (
@@ -9,9 +8,6 @@ export default function Terms() {
       
       <main className="flex-grow bg-slate-50 dark:bg-gray-900 py-12 px-4">
         <div className="max-w-3xl mx-auto">
-          {/* Ad at the top of the page */}
-          <InArticleAd className="mb-8" />
-          
           <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-sm">
             <h1 className="text-3xl font-bold mb-6 text-slate-800 dark:text-slate-100">Terms of Service</h1>
             
@@ -29,11 +25,6 @@ export default function Terms() {
               <p>
                 TikSave provides a service that allows users to download TikTok videos without watermarks for personal use only. The service processes publicly available TikTok videos and provides them in various formats.
               </p>
-              
-              {/* Ad in the middle of the content */}
-              <div className="my-8">
-                <InArticleAd />
-              </div>
               
               <h2 className="text-xl font-semibold mt-6 mb-3">3. User Responsibilities</h2>
               <p>
@@ -56,11 +47,6 @@ export default function Terms() {
               <p>
                 TikSave provides the service on an "as is" and "as available" basis. We make no warranties, expressed or implied, regarding the reliability, accuracy, or availability of the service. In no event shall SamaBrains be liable for any indirect, incidental, special, or consequential damages arising out of or in any way connected with the use of our service.
               </p>
-              
-              {/* Another ad in the middle of the content */}
-              <div className="my-8">
-                <InArticleAd />
-              </div>
               
               <h2 className="text-xl font-semibold mt-6 mb-3">6. Service Modifications</h2>
               <p>
@@ -92,9 +78,6 @@ export default function Terms() {
               </p>
             </div>
           </div>
-          
-          {/* Ad at the bottom of the page */}
-          <InArticleAd className="mt-8" />
         </div>
       </main>
       
