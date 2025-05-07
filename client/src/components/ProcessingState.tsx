@@ -73,7 +73,7 @@ export function ProcessingState({ processing, onReset }: ProcessingStateProps) {
         </div>
       )}
 
-      <div className="text-center text-xs text-slate-500 mb-6">
+      <div className="text-center text-xs text-slate-500">
         <p>SamaBrains uses advanced technology to process TikTok videos quickly and efficiently.</p>
       </div>
     </div>

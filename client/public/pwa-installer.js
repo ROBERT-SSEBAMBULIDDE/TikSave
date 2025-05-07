@@ -71,7 +71,13 @@ window.addEventListener('appinstalled', (event) => {
     installButton.style.display = 'none';
   }
   
-  // No analytics tracking
+  // Optional: track successful installations
+  if (typeof gtag === 'function') {
+    gtag('event', 'pwa_install', {
+      'event_category': 'PWA',
+      'event_label': 'App Installed'
+    });
+  }
 });
 
 // Expose installation method globally

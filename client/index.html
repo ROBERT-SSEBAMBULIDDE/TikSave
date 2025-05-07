@@ -2,62 +2,15 @@
 <html lang="en" class="light">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
-    <title>TikSave - Download TikTok Videos Without Watermark | Free & Fast</title>
-    <meta name="description" content="TikSave by SamaBrains - Download TikTok videos without watermark in high quality MP4, MP3, or WebM formats. Fast, easy, and 100% free." />
-    <meta name="keywords" content="TikTok downloader, download TikTok videos, TikTok without watermark, no watermark TikTok, TikTok video converter, TikSave, TikTok MP3, free TikTok downloader" />
-    <meta name="author" content="SamaBrains, Uganda" />
-    <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="https://tiksave.samabrains.com/" />
-    
-    <!-- SEO Open Graph tags -->
-    <meta property="og:title" content="TikSave - Download TikTok Videos Without Watermark" />
-    <meta property="og:description" content="Download TikTok videos without watermark in high quality. Fast, free, and easy to use with multiple format options including MP4, MP3, and WebM." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://tiksave.samabrains.com/" />
-    <meta property="og:image" content="/icons/icon-512x512.png" />
-    
-    <!-- Twitter Card data -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="TikSave - Download TikTok Videos Without Watermark" />
-    <meta name="twitter:description" content="Download TikTok videos without watermark for free. Fast and easy to use." />
-    <meta name="twitter:image" content="/icons/icon-512x512.png" />
-    
-    <!-- Structured Data / Schema.org for Rich Results -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "TikSave",
-      "url": "https://tiksave.samabrains.com",
-      "description": "Free online TikTok video downloader without watermark",
-      "applicationCategory": "MultimediaApplication",
-      "operatingSystem": "Any",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "author": {
-        "@type": "Organization",
-        "name": "SamaBrains",
-        "address": {
-          "@type": "PostalAddress",
-          "addressLocality": "Kampala",
-          "addressRegion": "Uganda"
-        },
-        "email": "info@samabrains.com",
-        "telephone": "+256759910596"
-      }
-    }
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <title>TikSave - Download TikTok Videos Without Watermark</title>
+    <meta name="description" content="TikSave by SamaBrains - Download TikTok videos without watermark in high quality. Fast, easy, and free." />
     
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#1d4ed8" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="TikSave" />
-    
     
     <!-- PWA Icons -->
     <link rel="manifest" href="/manifest.json" />
@@ -89,79 +42,12 @@
           navigator.serviceWorker.register('/sw.js')
             .then(function(registration) {
               console.log('ServiceWorker registration successful with scope: ', registration.scope);
-              // Skip waiting to activate new service worker if available
-              if (registration.waiting) {
-                registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-              }
             })
             .catch(function(error) {
               console.log('ServiceWorker registration failed: ', error);
             });
         });
       }
-    </script>
-    
-    <!-- Ad blocker script -->
-    <script>
-      window.addEventListener('DOMContentLoaded', function() {
-        function removeAds() {
-          // Remove "Advertisement" text nodes
-          const walker = document.createTreeWalker(
-            document.body,
-            NodeFilter.SHOW_TEXT,
-            null,
-            false
-          );
-
-          const nodesToRemove = [];
-          let node;
-          
-          while(node = walker.nextNode()) {
-            if (node.nodeValue && node.nodeValue.trim() === 'Advertisement') {
-              // Find parent container and remove it
-              let parent = node.parentNode;
-              let depth = 0;
-              // Try to find a significant container (go up 3 levels max)
-              while (parent && depth < 3) {
-                if (parent.tagName === 'DIV' || parent.tagName === 'SECTION' || parent.tagName === 'ASIDE') {
-                  nodesToRemove.push(parent);
-                  break;
-                }
-                parent = parent.parentNode;
-                depth++;
-              }
-              
-              if (depth >= 3) {
-                // If we couldn't find a good container, at least hide the text
-                nodesToRemove.push(node.parentNode);
-              }
-            }
-          }
-          
-          // Remove ad elements
-          nodesToRemove.forEach(function(element) {
-            if (element && element.parentNode) {
-              element.parentNode.removeChild(element);
-            }
-          });
-          
-          // Set a timer to check again (ads might load dynamically)
-          setTimeout(removeAds, 1000);
-        }
-        
-        // Run initially and set up observer
-        removeAds();
-        
-        // Watch for dynamic content changes
-        const observer = new MutationObserver(function(mutations) {
-          removeAds();
-        });
-        
-        observer.observe(document.body, { 
-          childList: true, 
-          subtree: true 
-        });
-      });
     </script>
   </body>
 </html>
