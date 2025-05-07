@@ -59,17 +59,11 @@ interface AdOptimizerProviderProps {
 }
 
 // Ad Optimizer Provider component
-// Define the provider component
-function AdOptimizerProviderComponent({ children }: AdOptimizerProviderProps) {
+export function AdOptimizerProvider({ children }: AdOptimizerProviderProps) {
   const [location] = useLocation();
-  // Use useMemo to prevent recalculating these values on every render
-  const initialDeviceType = React.useMemo(() => detectDeviceType(), []);
-  const initialUserJourney = React.useMemo(() => determineUserJourney(), []);
-  const initialContentContext = React.useMemo(() => determineContentContext(), []);
-  
-  const [deviceType, setDeviceType] = useState<DeviceType>(initialDeviceType);
-  const [userJourney, setUserJourney] = useState<UserJourney>(initialUserJourney);
-  const [contentContext, setContentContext] = useState<ContentContext>(initialContentContext);
+  const [deviceType, setDeviceType] = useState<DeviceType>(detectDeviceType());
+  const [userJourney, setUserJourney] = useState<UserJourney>(determineUserJourney());
+  const [contentContext, setContentContext] = useState<ContentContext>(determineContentContext());
   const [timeOnPage, setTimeOnPage] = useState(0);
   const [scrollDepth, setScrollDepth] = useState(0);
   const [isAdBlockerDetected, setIsAdBlockerDetected] = useState(false);
@@ -117,40 +111,26 @@ function AdOptimizerProviderComponent({ children }: AdOptimizerProviderProps) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
   
-  // Track scroll depth with debouncing to prevent excessive rerenders
+  // Track scroll depth
   useEffect(() => {
-    // Create a debounced version of the scroll handler
-    let scrollTimer: ReturnType<typeof setTimeout>;
     const handleScroll = () => {
-      clearTimeout(scrollTimer);
-      scrollTimer = setTimeout(() => {
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        const scrollHeight = document.documentElement.scrollHeight;
-        const clientHeight = document.documentElement.clientHeight;
-        
-        const depth = (scrollTop / (scrollHeight - clientHeight)) * 100;
-        const newDepth = Math.min(Math.round(depth), 100);
-        
-        // Only update if the value changed by at least 5 percentage points
-        if (Math.abs(newDepth - scrollDepth) >= 5) {
-          setScrollDepth(newDepth);
-        }
-      }, 100); // Debounce time
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight;
+      const clientHeight = document.documentElement.clientHeight;
+      
+      const depth = (scrollTop / (scrollHeight - clientHeight)) * 100;
+      setScrollDepth(Math.min(depth, 100));
     };
     
     window.addEventListener('scroll', handleScroll);
-    return () => {
-      clearTimeout(scrollTimer);
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [scrollDepth]);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
   
-  // Track time on page - less frequent updates to prevent jitter
+  // Track time on page
   useEffect(() => {
-    // Update every 5 seconds instead of every second to reduce renders
     const timer = setInterval(() => {
-      setTimeOnPage(prev => prev + 5);
-    }, 5000);
+      setTimeOnPage(prev => prev + 1);
+    }, 1000);
     
     return () => clearInterval(timer);
   }, []);
@@ -181,25 +161,14 @@ function AdOptimizerProviderComponent({ children }: AdOptimizerProviderProps) {
     }
   }, []);
   
-  // Update user journey based on session data - less frequent to prevent jitter
+  // Update user journey based on session data
   useEffect(() => {
-    // Initial check
-    const currentJourney = determineUserJourney();
-    if (userJourney !== currentJourney) {
-      setUserJourney(currentJourney);
-    }
-    
-    // Less frequent updates to prevent UI jitter
     const intervalId = setInterval(() => {
-      const newJourney = determineUserJourney();
-      // Only update if value has actually changed
-      if (userJourney !== newJourney) {
-        setUserJourney(newJourney);
-      }
-    }, 30000); // Check every 30 seconds instead of 5
+      setUserJourney(determineUserJourney());
+    }, 10000); // Check every 10 seconds
     
     return () => clearInterval(intervalId);
-  }, [userJourney]);
+  }, []);
   
   // Function to optimize ad placement
   const optimizeAd = (placementId: string) => {
@@ -220,17 +189,8 @@ function AdOptimizerProviderComponent({ children }: AdOptimizerProviderProps) {
     setAdsViewed(prev => prev + 1);
   };
   
-  // Memoize optimizer functions to prevent unnecessary rerenders
-  const optimizeAdMemo = React.useCallback((placementId: string) => {
-    return optimizeAd(placementId);
-  }, [deviceType, contentContext, userJourney]);
-  
-  const recordAdImpressionMemo = React.useCallback(() => {
-    recordAdImpression();
-  }, []);
-  
-  // Memoize the entire context value to prevent cascade rerenders
-  const value = React.useMemo(() => ({
+  // Context value
+  const value = {
     deviceType,
     userJourney,
     contentContext,
@@ -239,20 +199,9 @@ function AdOptimizerProviderComponent({ children }: AdOptimizerProviderProps) {
     isAdBlockerDetected,
     adsViewed,
     isInPWAMode,
-    optimizeAd: optimizeAdMemo,
-    recordAdImpression: recordAdImpressionMemo
-  }), [
-    deviceType, 
-    userJourney, 
-    contentContext, 
-    timeOnPage,
-    scrollDepth,
-    isAdBlockerDetected,
-    adsViewed,
-    isInPWAMode,
-    optimizeAdMemo,
-    recordAdImpressionMemo
-  ]);
+    optimizeAd,
+    recordAdImpression
+  };
   
   return (
     <AdOptimizerContext.Provider value={value}>
@@ -271,6 +220,3 @@ export function useAdOptimizer() {
   
   return context;
 }
-
-// Export the memoized provider
-export const AdOptimizerProvider = React.memo(AdOptimizerProviderComponent);
