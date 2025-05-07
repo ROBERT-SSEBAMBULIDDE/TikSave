@@ -1,7 +1,6 @@
 import { Progress } from "@/components/ui/progress";
 import { ProcessingStatus } from "@/lib/types";
 import { FAIcon } from "@/components/ui/fa-icon";
-import { AdContainer } from "@/components/AdContainer";
 
 interface ProcessingStateProps {
   processing: ProcessingStatus;
@@ -76,11 +75,6 @@ export function ProcessingState({ processing, onReset }: ProcessingStateProps) {
 
       <div className="text-center text-xs text-slate-500 mb-6">
         <p>SamaBrains uses advanced technology to process TikTok videos quickly and efficiently.</p>
-      </div>
-      
-      {/* Show ad while user is waiting */}
-      <div className="mt-4 bg-white rounded-lg p-3 border border-slate-200">
-        <AdContainer position="inline" />
       </div>
     </div>
   );
