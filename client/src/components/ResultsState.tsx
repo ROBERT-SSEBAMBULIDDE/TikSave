@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { FAIcon } from "@/components/ui/fa-icon";
 import { VideoData, DownloadFormat, VideoQuality } from "@/lib/types";
 import { useState, useRef, useEffect } from "react";
-import { ShareApp } from "./ShareApp";
 
 interface ResultsStateProps {
   videoData: VideoData;
@@ -210,13 +209,6 @@ export function ResultsState({
         <p className="text-xs text-center text-slate-500 mt-3">
           Fast download, no watermark, high quality
         </p>
-        
-        <div className="mt-6 pt-6 border-t border-slate-200">
-          <h3 className="text-lg font-semibold text-center mb-3">Loved this tool?</h3>
-          <div className="flex flex-wrap gap-2 justify-center">
-            <ShareApp />
-          </div>
-        </div>
       </div>
     </div>
   );

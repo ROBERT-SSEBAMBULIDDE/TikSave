@@ -4,7 +4,6 @@ import { DownloaderCard } from "@/components/DownloaderCard";
 import { FAQSection } from "@/components/FAQSection";
 import { Footer } from "@/components/Footer";
 import { DownloadHistorySection } from "@/components/DownloadHistorySection";
-import { ShareAppCTA } from "@/components/ShareAppCTA";
 import { AdUnit } from "@/components/AdUnit";
 
 export default function Home() {
@@ -19,7 +18,6 @@ export default function Home() {
           {/* First Ad Unit - Fluid format for article-style ads */}
           <AdUnit format="fluid" className="md:px-4" />
           <DownloadHistorySection />
-          <ShareAppCTA />
           {/* Second Ad Unit - Horizontal format for banner-style ads */}
           <AdUnit format="horizontal" className="md:px-4" />
         </div>
