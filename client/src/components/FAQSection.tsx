@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { FAIcon } from "@/components/ui/fa-icon";
+import { AdUnit } from "@/components/AdUnit";
 
 interface FAQItem {
   id: string;
