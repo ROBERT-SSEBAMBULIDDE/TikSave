@@ -1,65 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Share2, Twitter, Facebook, Mail } from "lucide-react";
 import { AdUnit } from "@/components/AdUnit";
-import { toast } from "@/hooks/use-toast";
 
 export default function HowItWorks() {
-  const [isCopied, setIsCopied] = useState(false);
-  
-  // Sharing functionality
-  const shareUrl = window.location.origin;
-  const shareTitle = "TikSave - Download TikTok Videos Without Watermark";
-  const shareText = "I just found this amazing guide on how to download TikTok videos without watermarks. It's super easy! Check it out:";
-  
-  const handleShareNative = async () => {
-    if (typeof navigator !== 'undefined' && 'share' in navigator) {
-      try {
-        await navigator.share({
-          title: shareTitle,
-          text: shareText,
-          url: shareUrl,
-        });
-      } catch (error) {
-        console.error('Error sharing:', error);
-      }
-    }
-  };
-  
-  const handleShareTwitter = () => {
-    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
-    window.open(twitterUrl, '_blank');
-  };
-  
-  const handleShareFacebook = () => {
-    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
-    window.open(facebookUrl, '_blank');
-  };
-  
-  const handleShareEmail = () => {
-    const mailtoUrl = `mailto:?subject=${encodeURIComponent(shareTitle)}&body=${encodeURIComponent(shareText + ' ' + shareUrl)}`;
-    window.location.href = mailtoUrl;
-  };
-  
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(shareUrl).then(() => {
-      setIsCopied(true);
-      toast({
-        title: "Link copied!",
-        description: "You can now share it with your friends."
-      });
-      
-      // Reset the copied state after 2 seconds
-      setTimeout(() => {
-        setIsCopied(false);
-      }, 2000);
-    }).catch(err => {
-      console.error('Failed to copy: ', err);
-    });
-  };
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -211,57 +156,6 @@ export default function HowItWorks() {
           </Card>
           
           {/* Horizontal ad format for bottom of page */}
-          {/* Share Section */}
-          <Card className="mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border-blue-200 dark:border-blue-800/50">
-            <CardContent className="pt-6">
-              <h2 className="text-2xl font-semibold mb-4 text-center text-blue-700 dark:text-blue-400">
-                Share This Guide With Friends
-              </h2>
-              
-              <p className="text-center mb-6 text-slate-700 dark:text-slate-300">
-                Know someone who struggles with TikTok downloads? Help them out by sharing this guide!
-              </p>
-              
-              <div className="flex flex-wrap justify-center gap-3 max-w-lg mx-auto">
-                {typeof navigator !== 'undefined' && 'share' in navigator && (
-                  <Button onClick={handleShareNative} className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700">
-                    <Share2 className="mr-2 h-4 w-4" />
-                    Share Guide
-                  </Button>
-                )}
-                
-                <Button onClick={handleShareTwitter} variant="outline" className="border-blue-300 text-[#1DA1F2] hover:bg-blue-50 dark:border-blue-700 dark:hover:bg-blue-900/30">
-                  <Twitter className="mr-2 h-4 w-4" />
-                  Twitter
-                </Button>
-                
-                <Button onClick={handleShareFacebook} variant="outline" className="border-blue-300 text-[#1877F2] hover:bg-blue-50 dark:border-blue-700 dark:hover:bg-blue-900/30">
-                  <Facebook className="mr-2 h-4 w-4" />
-                  Facebook
-                </Button>
-                
-                <Button onClick={handleShareEmail} variant="outline" className="border-blue-300 text-blue-600 hover:bg-blue-50 dark:border-blue-700 dark:text-blue-400 dark:hover:bg-blue-900/30">
-                  <Mail className="mr-2 h-4 w-4" />
-                  Email
-                </Button>
-                
-                <Button onClick={handleCopyLink} variant="outline" className={`border-blue-300 hover:bg-blue-50 dark:border-blue-700 dark:hover:bg-blue-900/30 ${isCopied ? 'bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400' : 'text-slate-700 dark:text-slate-300'}`}>
-                  {isCopied ? (
-                    <>
-                      <span className="mr-2">✓</span>
-                      Copied!
-                    </>
-                  ) : (
-                    <>
-                      <span className="mr-2">🔗</span>
-                      Copy Link
-                    </>
-                  )}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-          
           <AdUnit format="horizontal" />
         </div>
       </main>
