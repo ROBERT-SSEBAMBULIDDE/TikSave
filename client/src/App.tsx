@@ -33,14 +33,16 @@ function App() {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <QueryClientProvider client={queryClient}>
-        <AdOptimizerProvider>
+        {/* Temporarily commenting out AdOptimizerProvider to fix shaking issues */}
+        {/* <AdOptimizerProvider> */}
           <TooltipProvider>
             <Toaster />
             <Router />
             <DirectInstallButton />
-            {showAdOptimizerDashboard && <AdOptimizerDashboard />}
+            {/* Dashboard disabled to prevent layout shift */}
+            {/* {showAdOptimizerDashboard && <AdOptimizerDashboard />} */}
           </TooltipProvider>
-        </AdOptimizerProvider>
+        {/* </AdOptimizerProvider> */}
       </QueryClientProvider>
     </ThemeProvider>
   );
