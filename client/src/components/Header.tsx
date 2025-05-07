@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { ThemeToggle } from "./ThemeToggle";
 import { PWAInstallModal } from "./PWAInstallModal";
 import { useState, useEffect } from "react";
+import { AdPlacement } from "./AdPlacement";
 
 export function Header() {
   // Check if we're running in a standalone PWA mode
