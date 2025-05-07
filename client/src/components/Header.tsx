@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { ThemeToggle } from "./ThemeToggle";
 import { PWAInstallModal } from "./PWAInstallModal";
 import { useState, useEffect } from "react";
+import { AdPlacement } from "./AdPlacement";
 
 export function Header() {
   // Check if we're running in a standalone PWA mode
@@ -44,6 +45,12 @@ export function Header() {
   
   return (
     <header className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-md dark:from-gray-800 dark:to-gray-900">
+      {/* Ad banner at the top of the header */}
+      <div className="w-full bg-white border-b border-gray-200">
+        <div className="max-w-5xl mx-auto px-4">
+          <AdPlacement location="header" />
+        </div>
+      </div>
       
       <div className="max-w-5xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
         <Link href="/">

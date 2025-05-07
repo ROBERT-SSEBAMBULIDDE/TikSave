@@ -1,9 +1,16 @@
 import { FAIcon } from "@/components/ui/fa-icon";
 import { Link } from "wouter";
+import { AdPlacement } from "@/components/AdPlacement";
 
 export function Footer() {
   return (
     <footer className="bg-slate-800 text-slate-300 py-8 px-4">
+      {/* Ad banner above footer content */}
+      <div className="w-full bg-white border-t border-gray-200 mb-8">
+        <div className="max-w-5xl mx-auto px-4">
+          <AdPlacement location="footer" />
+        </div>
+      </div>
       
       <div className="max-w-5xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
