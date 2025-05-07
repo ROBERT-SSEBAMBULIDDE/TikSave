@@ -38,46 +38,13 @@ export function FAQSection() {
     setOpenFaqId(openFaqId === id ? null : id);
   };
 
-  // Reference for this section to help with context detection
-  const sectionRef = useRef<HTMLElement>(null);
-  
-  useEffect(() => {
-    // Add ID to the section for context detection
-    if (sectionRef.current) {
-      sectionRef.current.id = 'faq-section';
-    }
-  }, []);
-  
   return (
-    <section ref={sectionRef} className="py-12 px-4 bg-slate-50">
+    <section className="py-12 px-4 bg-slate-50">
       <div className="max-w-3xl mx-auto">
         <h2 className="text-2xl font-bold mb-8 text-center">Frequently Asked Questions</h2>
         
         <div className="space-y-4">
-          {/* First half of FAQs */}
-          {faqs.slice(0, Math.ceil(faqs.length / 2)).map((faq) => (
-            <div key={faq.id} className="bg-white p-4 rounded-lg shadow-sm">
-              <button 
-                className="flex justify-between items-center w-full text-left" 
-                onClick={() => toggleFaq(faq.id)}
-              >
-                <span className="font-medium">{faq.question}</span>
-                <FAIcon icon={openFaqId === faq.id ? "chevron-up" : "chevron-down"} className="text-slate-400" />
-              </button>
-              <div className={`mt-2 text-slate-600 ${openFaqId === faq.id ? 'block' : 'hidden'}`}>
-                {faq.answer}
-              </div>
-            </div>
-          ))}
-          
-          {/* Context-aware ad in the middle of FAQs */}
-          <AdUnit 
-            placementId="faq_middle" 
-            className="my-6" 
-          />
-          
-          {/* Second half of FAQs */}
-          {faqs.slice(Math.ceil(faqs.length / 2)).map((faq) => (
+          {faqs.map((faq) => (
             <div key={faq.id} className="bg-white p-4 rounded-lg shadow-sm">
               <button 
                 className="flex justify-between items-center w-full text-left" 

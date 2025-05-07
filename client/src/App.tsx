@@ -11,7 +11,6 @@ import HowItWorks from "@/pages/howitworks";
 import { ThemeProvider } from "./providers/ThemeProvider";
 import { AdOptimizerProvider } from "./providers/AdOptimizerProvider";
 import { DirectInstallButton } from "@/components/DirectInstallButton";
-import { AdOptimizerDashboard } from "@/components/AdOptimizerDashboard";
 
 function Router() {
   return (
@@ -27,9 +26,6 @@ function Router() {
 }
 
 function App() {
-  // Only show the ad optimizer dashboard in development mode
-  const showAdOptimizerDashboard = import.meta.env.DEV;
-  
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <QueryClientProvider client={queryClient}>
@@ -38,7 +34,6 @@ function App() {
             <Toaster />
             <Router />
             <DirectInstallButton />
-            {showAdOptimizerDashboard && <AdOptimizerDashboard />}
           </TooltipProvider>
         </AdOptimizerProvider>
       </QueryClientProvider>
