@@ -16,23 +16,12 @@ export default function Home() {
         <HeroSection />
         <DownloaderCard />
         <div className="container max-w-6xl px-4 py-8">
-          {/* First Ad Unit - optimized format based on context */}
-          <AdUnit 
-            placementId="home_top" 
-            className="md:px-4" 
-            fallbackContent={
-              <div className="text-center py-4 text-sm text-gray-500">
-                Consider supporting TikSave by disabling your ad blocker
-              </div>
-            }
-          />
+          {/* First Ad Unit - Fluid format for article-style ads */}
+          <AdUnit format="fluid" className="md:px-4" />
           <DownloadHistorySection />
           <ShareAppCTA />
-          {/* Second Ad Unit - optimized format based on context */}
-          <AdUnit 
-            placementId="home_bottom" 
-            className="md:px-4" 
-          />
+          {/* Second Ad Unit - Horizontal format for banner-style ads */}
+          <AdUnit format="horizontal" className="md:px-4" />
         </div>
         <FAQSection />
       </main>

@@ -13,16 +13,8 @@ export default function HowItWorks() {
         <div className="container max-w-4xl mx-auto px-4 py-8">
           <h1 className="text-3xl font-bold text-center mb-8 text-blue-800 dark:text-blue-400">How It Works</h1>
           
-          {/* Optimized ad unit for how-it-works page */}
-          <AdUnit 
-            placementId="howitworks_top" 
-            className="mb-8"
-            fallbackContent={
-              <div className="text-center py-2 text-sm text-gray-500">
-                TikSave is completely free! Please consider disabling your ad blocker.
-              </div>
-            }
-          />
+          {/* Rectangle ad format for top of page */}
+          <AdUnit format="rectangle" className="mb-8" />
           
           <Card className="mb-8">
             <CardContent className="pt-6">
@@ -163,10 +155,8 @@ export default function HowItWorks() {
             </CardContent>
           </Card>
           
-          {/* Optimized ad unit for bottom of page */}
-          <AdUnit 
-            placementId="howitworks_bottom" 
-          />
+          {/* Horizontal ad format for bottom of page */}
+          <AdUnit format="horizontal" />
         </div>
       </main>
       

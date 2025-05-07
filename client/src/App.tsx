@@ -9,7 +9,6 @@ import Terms from "@/pages/terms";
 import Privacy from "@/pages/privacy";
 import HowItWorks from "@/pages/howitworks";
 import { ThemeProvider } from "./providers/ThemeProvider";
-import { AdOptimizerProvider } from "./providers/AdOptimizerProvider";
 import { DirectInstallButton } from "@/components/DirectInstallButton";
 
 function Router() {
@@ -29,13 +28,11 @@ function App() {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <QueryClientProvider client={queryClient}>
-        <AdOptimizerProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Router />
-            <DirectInstallButton />
-          </TooltipProvider>
-        </AdOptimizerProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+          <DirectInstallButton />
+        </TooltipProvider>
       </QueryClientProvider>
     </ThemeProvider>
   );
