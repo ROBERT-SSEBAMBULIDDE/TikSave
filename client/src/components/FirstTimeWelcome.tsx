@@ -32,14 +32,11 @@ export function FirstTimeWelcome() {
   };
   
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => {
-      setOpen(isOpen);
-      if (!isOpen) markVisited();
-    }}>
-      <DialogContent className="sm:max-w-md animate-scale-in">
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-xl flex items-center">
-            <FAIcon icon="wand-magic-sparkles" className="mr-2 text-blue-500" />
+            <FAIcon icon="magic" className="mr-2 text-blue-500" />
             Welcome to TikSave!
           </DialogTitle>
           <DialogDescription>
@@ -49,42 +46,38 @@ export function FirstTimeWelcome() {
         
         <div className="space-y-4 py-4">
           <div className="flex">
-            <div className="bg-blue-100 dark:bg-blue-900 rounded-full p-2 mr-3 text-blue-600 dark:text-blue-300">
+            <div className="bg-blue-100 rounded-full p-2 mr-3 text-blue-600">
               <FAIcon icon="paste" />
             </div>
             <div>
               <h3 className="font-medium">Easy to Use</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Just paste a TikTok video URL to get started.</p>
+              <p className="text-sm text-slate-500">Just paste a TikTok video URL to get started.</p>
             </div>
           </div>
           
           <div className="flex">
-            <div className="bg-blue-100 dark:bg-blue-900 rounded-full p-2 mr-3 text-blue-600 dark:text-blue-300">
-              <FAIcon icon="sliders" />
+            <div className="bg-blue-100 rounded-full p-2 mr-3 text-blue-600">
+              <FAIcon icon="sliders-h" />
             </div>
             <div>
               <h3 className="font-medium">Multiple Formats</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Choose between MP4, MP3, and WebM formats.</p>
+              <p className="text-sm text-slate-500">Choose between MP4, MP3, and WebM formats.</p>
             </div>
           </div>
           
           <div className="flex">
-            <div className="bg-blue-100 dark:bg-blue-900 rounded-full p-2 mr-3 text-blue-600 dark:text-blue-300">
-              <FAIcon icon="circle-question" />
+            <div className="bg-blue-100 rounded-full p-2 mr-3 text-blue-600">
+              <FAIcon icon="question-circle" />
             </div>
             <div>
               <h3 className="font-medium">Look for Help Tips</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400">
-                Look for <FAIcon icon="circle-question" className="text-xs text-blue-500 mx-1" /> icons for helpful tips.
-              </p>
+              <p className="text-sm text-slate-500">Hover over elements with <FAIcon icon="question-circle" className="text-xs text-blue-500" /> for helpful tips.</p>
             </div>
           </div>
         </div>
         
         <DialogFooter>
-          <Button onClick={handleClose} className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800">
-            Get Started
-          </Button>
+          <Button onClick={handleClose} className="w-full">Get Started</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

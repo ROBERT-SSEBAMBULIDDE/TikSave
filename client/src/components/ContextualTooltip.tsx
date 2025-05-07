@@ -29,87 +29,56 @@ export function ContextualTooltip({
 }: ContextualTooltipProps) {
   // Track if the tooltip should be shown
   const [shouldShow, setShouldShow] = useState<boolean>(false);
-  const [open, setOpen] = useState<boolean>(false);
   
   useEffect(() => {
     // Check if this tooltip has been seen before
-    try {
-      const seenTooltips = localStorage.getItem('seen_tooltips');
-      const seenArray = seenTooltips ? JSON.parse(seenTooltips) : [];
-      
-      // Show tooltip if it hasn't been seen before or force show is enabled
-      const shouldDisplayTooltip = forceShow || !seenArray.includes(id);
-      setShouldShow(shouldDisplayTooltip);
-      
-      // If it should be shown, automatically set it to open
-      if (shouldDisplayTooltip) {
-        // Slight delay to ensure smooth animation
-        const timer = setTimeout(() => {
-          setOpen(true);
-        }, 200);
-        
-        return () => clearTimeout(timer);
-      }
-    } catch (error) {
-      console.error("Error checking tooltip visibility:", error);
-      // In case of an error, default to showing the tooltip
-      setShouldShow(true);
-      setOpen(true);
-    }
+    const seenTooltips = localStorage.getItem('seen_tooltips');
+    const seenArray = seenTooltips ? JSON.parse(seenTooltips) : [];
+    
+    // Show tooltip if it hasn't been seen before or force show is enabled
+    setShouldShow(forceShow || !seenArray.includes(id));
   }, [id, forceShow]);
   
   // Mark tooltip as seen when it's clicked
   const markAsSeen = () => {
-    try {
-      if (!forceShow) {
-        const seenTooltips = localStorage.getItem('seen_tooltips');
-        const seenArray = seenTooltips ? JSON.parse(seenTooltips) : [];
-        
-        if (!seenArray.includes(id)) {
-          seenArray.push(id);
-          localStorage.setItem('seen_tooltips', JSON.stringify(seenArray));
-        }
-        
-        setOpen(false);
-        setShouldShow(false);
+    if (!forceShow) {
+      const seenTooltips = localStorage.getItem('seen_tooltips');
+      const seenArray = seenTooltips ? JSON.parse(seenTooltips) : [];
+      
+      if (!seenArray.includes(id)) {
+        seenArray.push(id);
+        localStorage.setItem('seen_tooltips', JSON.stringify(seenArray));
       }
-    } catch (error) {
-      console.error("Error marking tooltip as seen:", error);
-      // Close tooltip anyway to avoid it being stuck
-      setOpen(false);
+      
+      setShouldShow(false);
     }
   };
   
-  // If it shouldn't be shown at all, just render the children
   if (!shouldShow && !forceShow) {
     return <>{children}</>;
   }
   
   return (
     <TooltipProvider>
-      <Tooltip open={open} onOpenChange={setOpen}>
-        <TooltipTrigger asChild onClick={() => !open && setOpen(true)}>
-          <div className={className}>
-            {withIcon ? (
-              <div className="group relative inline-flex items-center">
-                {children}
-                <span className="ml-1 text-blue-500 flex items-center">
-                  <FAIcon icon="question-circle" className="text-xs" />
-                </span>
-              </div>
-            ) : (
-              children
-            )}
-          </div>
+      <Tooltip defaultOpen={shouldShow} delayDuration={0}>
+        <TooltipTrigger onClick={markAsSeen} className={className}>
+          {withIcon ? (
+            <div className="group relative inline-flex items-center">
+              {children}
+              <span className="ml-1 text-blue-500 flex items-center">
+                <FAIcon icon="question-circle" className="text-xs" />
+              </span>
+            </div>
+          ) : (
+            children
+          )}
         </TooltipTrigger>
         <TooltipContent 
           side={side} 
-          sideOffset={5}
           className={cn(
             "bg-blue-50 text-slate-800 border border-blue-200 p-3 max-w-xs shadow-lg rounded-lg",
-            "animate-fade-in z-50"
+            "animate-fade-in duration-200"
           )}
-          onClick={markAsSeen}
         >
           <div className="text-sm">{content}</div>
           <div className="mt-2 text-xs text-blue-700 text-right">Click to dismiss</div>
