@@ -59,11 +59,17 @@ interface AdOptimizerProviderProps {
 }
 
 // Ad Optimizer Provider component
-export function AdOptimizerProvider({ children }: AdOptimizerProviderProps) {
+// Use React.memo for the provider component to prevent unnecessary rerenders
+export const AdOptimizerProvider = React.memo(function AdOptimizerProvider({ children }: AdOptimizerProviderProps) {
   const [location] = useLocation();
-  const [deviceType, setDeviceType] = useState<DeviceType>(detectDeviceType());
-  const [userJourney, setUserJourney] = useState<UserJourney>(determineUserJourney());
-  const [contentContext, setContentContext] = useState<ContentContext>(determineContentContext());
+  // Use useMemo to prevent recalculating these values on every render
+  const initialDeviceType = React.useMemo(() => detectDeviceType(), []);
+  const initialUserJourney = React.useMemo(() => determineUserJourney(), []);
+  const initialContentContext = React.useMemo(() => determineContentContext(), []);
+  
+  const [deviceType, setDeviceType] = useState<DeviceType>(initialDeviceType);
+  const [userJourney, setUserJourney] = useState<UserJourney>(initialUserJourney);
+  const [contentContext, setContentContext] = useState<ContentContext>(initialContentContext);
   const [timeOnPage, setTimeOnPage] = useState(0);
   const [scrollDepth, setScrollDepth] = useState(0);
   const [isAdBlockerDetected, setIsAdBlockerDetected] = useState(false);
@@ -214,8 +220,17 @@ export function AdOptimizerProvider({ children }: AdOptimizerProviderProps) {
     setAdsViewed(prev => prev + 1);
   };
   
-  // Context value
-  const value = {
+  // Memoize optimizer functions to prevent unnecessary rerenders
+  const optimizeAdMemo = React.useCallback((placementId: string) => {
+    return optimizeAd(placementId);
+  }, [deviceType, contentContext, userJourney]);
+  
+  const recordAdImpressionMemo = React.useCallback(() => {
+    recordAdImpression();
+  }, []);
+  
+  // Memoize the entire context value to prevent cascade rerenders
+  const value = React.useMemo(() => ({
     deviceType,
     userJourney,
     contentContext,
@@ -224,9 +239,20 @@ export function AdOptimizerProvider({ children }: AdOptimizerProviderProps) {
     isAdBlockerDetected,
     adsViewed,
     isInPWAMode,
-    optimizeAd,
-    recordAdImpression
-  };
+    optimizeAd: optimizeAdMemo,
+    recordAdImpression: recordAdImpressionMemo
+  }), [
+    deviceType, 
+    userJourney, 
+    contentContext, 
+    timeOnPage,
+    scrollDepth,
+    isAdBlockerDetected,
+    adsViewed,
+    isInPWAMode,
+    optimizeAdMemo,
+    recordAdImpressionMemo
+  ]);
   
   return (
     <AdOptimizerContext.Provider value={value}>

@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-// Temporarily removed AdOptimizer context to fix shaking
-// import { useAdOptimizer } from '@/providers/AdOptimizerProvider';
+import { useAdOptimizer } from '@/providers/AdOptimizerProvider';
 import { AdFormat } from '@/lib/adOptimizer';
 
 interface AdUnitProps {
@@ -20,24 +19,23 @@ export function AdUnit({
 }: AdUnitProps) {
   const adRef = useRef<HTMLDivElement>(null);
   
-  // Temporary hardcoded values instead of using context
-  const isAdBlockerDetected = false;
-  // Check for PWA mode directly
-  const isInPWAMode = typeof window !== 'undefined' && 
-    window.matchMedia?.('(display-mode: standalone)').matches;
-  const recordAdImpression = () => {}; // No-op function
+  // Get optimizer context
+  const { 
+    optimizeAd, 
+    recordAdImpression, 
+    isAdBlockerDetected, 
+    isInPWAMode 
+  } = useAdOptimizer();
   
   const [isLoaded, setIsLoaded] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   
-  // Hardcoded values instead of using optimizer
-  const format = propFormat;
-  const slot = propSlot;
-  const show = true; // Always show ads
+  // Get optimized ad values with fallbacks to prevent layout shifts
+  const { format, slot, show } = optimizeAd(placementId);
   
-  // Use direct values instead of optimizer
-  const finalFormat = format;
-  const finalSlot = slot;
+  // Use optimized values or fallback to props
+  const finalFormat = format || propFormat;
+  const finalSlot = slot || propSlot;
   
   // Observer to check if ad is in viewport - with optimized observation
   useEffect(() => {
