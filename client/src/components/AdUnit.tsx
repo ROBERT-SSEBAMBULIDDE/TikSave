@@ -34,21 +34,33 @@ export function AdUnit({
   const finalFormat = format || initialFormat;
   const finalSlot = slot || initialSlot;
   
-  // Observer to check if ad is in viewport
+  // Observer to check if ad is in viewport - with optimized observation
   useEffect(() => {
     if (!adRef.current || !show) return;
     
+    // Use lower threshold and optimize the observer to reduce jitter
     const observer = new IntersectionObserver(
       (entries) => {
         const [entry] = entries;
-        setIsVisible(entry.isIntersecting);
+        // Only update visibility state if it's a significant change
+        const newIsVisible = entry.isIntersecting;
         
-        // Record an impression once it's visible
-        if (entry.isIntersecting && isLoaded) {
-          recordAdImpression();
+        if (isVisible !== newIsVisible) {
+          setIsVisible(newIsVisible);
+          
+          // Record an impression only once it's visible and loaded
+          if (newIsVisible && isLoaded) {
+            // Use a slight delay to ensure stability
+            setTimeout(() => {
+              recordAdImpression();
+            }, 200);
+          }
         }
       },
-      { threshold: 0.5 }
+      { 
+        threshold: 0.1, // Lower threshold for better performance
+        rootMargin: '50px' // Preload a bit before coming into view
+      }
     );
     
     observer.observe(adRef.current);
@@ -58,7 +70,7 @@ export function AdUnit({
         observer.unobserve(adRef.current);
       }
     };
-  }, [isLoaded, recordAdImpression, show]);
+  }, [isLoaded, recordAdImpression, show, isVisible]);
   
   useEffect(() => {
     if (!show) return;
@@ -154,19 +166,24 @@ export function AdUnit({
       loadAd();
     }, 100);
     
-    // Handle resize events to ensure ads are responsive
+    // Handle resize events to ensure ads are responsive - with improved performance
+    let previousWidth = window.innerWidth;
     const handleResize = () => {
-      // Reload ad on significant size changes
-      if (adRef.current) {
+      // Only reload if width changed significantly (by at least 100px)
+      // This prevents reloads on small adjustments like scrollbar appearance
+      const currentWidth = window.innerWidth;
+      if (Math.abs(currentWidth - previousWidth) > 100 && adRef.current) {
+        previousWidth = currentWidth;
         loadAd();
       }
     };
     
-    // Add debounced resize listener
+    // Add debounced resize listener with a longer delay
     let resizeTimer: ReturnType<typeof setTimeout>;
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(handleResize, 300);
+      // Wait longer before reacting to resize to reduce jitter
+      resizeTimer = setTimeout(handleResize, 500);
     });
     
     // Cleanup on unmount

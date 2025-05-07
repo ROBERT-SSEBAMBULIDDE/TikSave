@@ -111,26 +111,40 @@ export function AdOptimizerProvider({ children }: AdOptimizerProviderProps) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
   
-  // Track scroll depth
+  // Track scroll depth with debouncing to prevent excessive rerenders
   useEffect(() => {
+    // Create a debounced version of the scroll handler
+    let scrollTimer: ReturnType<typeof setTimeout>;
     const handleScroll = () => {
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const scrollHeight = document.documentElement.scrollHeight;
-      const clientHeight = document.documentElement.clientHeight;
-      
-      const depth = (scrollTop / (scrollHeight - clientHeight)) * 100;
-      setScrollDepth(Math.min(depth, 100));
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight;
+        
+        const depth = (scrollTop / (scrollHeight - clientHeight)) * 100;
+        const newDepth = Math.min(Math.round(depth), 100);
+        
+        // Only update if the value changed by at least 5 percentage points
+        if (Math.abs(newDepth - scrollDepth) >= 5) {
+          setScrollDepth(newDepth);
+        }
+      }, 100); // Debounce time
     };
     
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    return () => {
+      clearTimeout(scrollTimer);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [scrollDepth]);
   
-  // Track time on page
+  // Track time on page - less frequent updates to prevent jitter
   useEffect(() => {
+    // Update every 5 seconds instead of every second to reduce renders
     const timer = setInterval(() => {
-      setTimeOnPage(prev => prev + 1);
-    }, 1000);
+      setTimeOnPage(prev => prev + 5);
+    }, 5000);
     
     return () => clearInterval(timer);
   }, []);
@@ -161,14 +175,25 @@ export function AdOptimizerProvider({ children }: AdOptimizerProviderProps) {
     }
   }, []);
   
-  // Update user journey based on session data
+  // Update user journey based on session data - less frequent to prevent jitter
   useEffect(() => {
+    // Initial check
+    const currentJourney = determineUserJourney();
+    if (userJourney !== currentJourney) {
+      setUserJourney(currentJourney);
+    }
+    
+    // Less frequent updates to prevent UI jitter
     const intervalId = setInterval(() => {
-      setUserJourney(determineUserJourney());
-    }, 5000); // Check every 5 seconds for changes
+      const newJourney = determineUserJourney();
+      // Only update if value has actually changed
+      if (userJourney !== newJourney) {
+        setUserJourney(newJourney);
+      }
+    }, 30000); // Check every 30 seconds instead of 5
     
     return () => clearInterval(intervalId);
-  }, []);
+  }, [userJourney]);
   
   // Function to optimize ad placement
   const optimizeAd = (placementId: string) => {

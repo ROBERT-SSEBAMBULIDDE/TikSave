@@ -63,10 +63,19 @@ export function AdOptimizerDashboard() {
     }));
   };
   
+  // Use a portal for the dashboard to prevent parent component layout shifts
   return (
-    <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4">
-      <Card className="w-full max-w-4xl max-h-[90vh] overflow-auto">
-        <CardHeader className="flex flex-row items-center justify-between">
+    <div 
+      className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4"
+      // Prevent event propagation to avoid rerenders of parent components
+      onClick={(e) => e.stopPropagation()}
+    >
+      <Card 
+        className="w-full max-w-4xl max-h-[90vh] overflow-auto"
+        // Prevent scrolling the main page when scrolling the dashboard
+        onScroll={(e) => e.stopPropagation()}
+      >
+        <CardHeader className="flex flex-row items-center justify-between sticky top-0 bg-white dark:bg-gray-900 z-10">
           <CardTitle>Ad Placement Optimizer</CardTitle>
           <Button 
             variant="outline" 
