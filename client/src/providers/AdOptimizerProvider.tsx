@@ -165,7 +165,7 @@ export function AdOptimizerProvider({ children }: AdOptimizerProviderProps) {
   useEffect(() => {
     const intervalId = setInterval(() => {
       setUserJourney(determineUserJourney());
-    }, 10000); // Check every 10 seconds
+    }, 5000); // Check every 5 seconds for changes
     
     return () => clearInterval(intervalId);
   }, []);

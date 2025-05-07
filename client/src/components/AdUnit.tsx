@@ -13,57 +13,37 @@ interface AdUnitProps {
 export function AdUnit({ 
   className = '', 
   placementId,
-  format: propFormat = 'fluid',
-  slot: propSlot = '6862860274',
+  format: initialFormat = 'fluid',
+  slot: initialSlot = '6862860274',
   fallbackContent
 }: AdUnitProps) {
   const adRef = useRef<HTMLDivElement>(null);
-  
-  // Get optimizer context
-  const { 
-    optimizeAd, 
-    recordAdImpression, 
-    isAdBlockerDetected, 
-    isInPWAMode 
-  } = useAdOptimizer();
-  
+  const { optimizeAd, recordAdImpression, isAdBlockerDetected } = useAdOptimizer();
   const [isLoaded, setIsLoaded] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   
-  // Get optimized ad values with fallbacks to prevent layout shifts
+  // Optimize ad based on context
   const { format, slot, show } = optimizeAd(placementId);
   
   // Use optimized values or fallback to props
-  const finalFormat = format || propFormat;
-  const finalSlot = slot || propSlot;
+  const finalFormat = format || initialFormat;
+  const finalSlot = slot || initialSlot;
   
-  // Observer to check if ad is in viewport - with optimized observation
+  // Observer to check if ad is in viewport
   useEffect(() => {
     if (!adRef.current || !show) return;
     
-    // Use lower threshold and optimize the observer to reduce jitter
     const observer = new IntersectionObserver(
       (entries) => {
         const [entry] = entries;
-        // Only update visibility state if it's a significant change
-        const newIsVisible = entry.isIntersecting;
+        setIsVisible(entry.isIntersecting);
         
-        if (isVisible !== newIsVisible) {
-          setIsVisible(newIsVisible);
-          
-          // Record an impression only once it's visible and loaded
-          if (newIsVisible && isLoaded) {
-            // Use a slight delay to ensure stability
-            setTimeout(() => {
-              recordAdImpression();
-            }, 200);
-          }
+        // Record an impression once it's visible
+        if (entry.isIntersecting && isLoaded) {
+          recordAdImpression();
         }
       },
-      { 
-        threshold: 0.1, // Lower threshold for better performance
-        rootMargin: '50px' // Preload a bit before coming into view
-      }
+      { threshold: 0.5 }
     );
     
     observer.observe(adRef.current);
@@ -73,7 +53,7 @@ export function AdUnit({
         observer.unobserve(adRef.current);
       }
     };
-  }, [isLoaded, recordAdImpression, show, isVisible]);
+  }, [isLoaded, recordAdImpression, show]);
   
   useEffect(() => {
     if (!show) return;
@@ -111,18 +91,6 @@ export function AdUnit({
           ins.setAttribute('data-ad-slot', finalSlot);
           ins.setAttribute('data-full-width-responsive', 'true');
           
-          // Add PWA-specific attribute if in PWA mode
-          if (isInPWAMode) {
-            ins.setAttribute('data-pwa-version', 'true');
-            
-            // In PWA mode, force more aggressive ad refreshing
-            ins.setAttribute('data-adtest', 'on');
-            
-            // Add timestamp to prevent potential caching issues in PWA
-            const timestamp = new Date().getTime();
-            ins.setAttribute('data-pwa-timestamp', timestamp.toString());
-          }
-          
           // Add the ins element to our ref
           adRef.current.appendChild(ins);
           
@@ -137,21 +105,6 @@ export function AdUnit({
               if (isVisible) {
                 recordAdImpression();
               }
-            } else if (isInPWAMode) {
-              // In PWA mode, if adsbygoogle isn't available, try to reload the ad script
-              const script = document.createElement('script');
-              script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6859477325721314';
-              script.async = true;
-              script.crossOrigin = 'anonymous';
-              document.head.appendChild(script);
-              
-              // Try again after script loads
-              script.onload = () => {
-                if ((window as any).adsbygoogle) {
-                  (window as any).adsbygoogle.push({});
-                  setIsLoaded(true);
-                }
-              };
             }
           } catch (error) {
             console.error('AdSense push error:', error);
@@ -169,24 +122,19 @@ export function AdUnit({
       loadAd();
     }, 100);
     
-    // Handle resize events to ensure ads are responsive - with improved performance
-    let previousWidth = window.innerWidth;
+    // Handle resize events to ensure ads are responsive
     const handleResize = () => {
-      // Only reload if width changed significantly (by at least 100px)
-      // This prevents reloads on small adjustments like scrollbar appearance
-      const currentWidth = window.innerWidth;
-      if (Math.abs(currentWidth - previousWidth) > 100 && adRef.current) {
-        previousWidth = currentWidth;
+      // Reload ad on significant size changes
+      if (adRef.current) {
         loadAd();
       }
     };
     
-    // Add debounced resize listener with a longer delay
+    // Add debounced resize listener
     let resizeTimer: ReturnType<typeof setTimeout>;
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimer);
-      // Wait longer before reacting to resize to reduce jitter
-      resizeTimer = setTimeout(handleResize, 500);
+      resizeTimer = setTimeout(handleResize, 300);
     });
     
     // Cleanup on unmount
@@ -198,7 +146,7 @@ export function AdUnit({
       clearTimeout(resizeTimer);
       window.removeEventListener('resize', handleResize);
     };
-  }, [finalFormat, finalSlot, isVisible, recordAdImpression, show, isInPWAMode]);
+  }, [finalFormat, finalSlot, isVisible, recordAdImpression, show]);
   
   // If optimizer decides not to show the ad or if ad blocker is detected
   if (!show || isAdBlockerDetected) {
@@ -214,11 +162,8 @@ export function AdUnit({
     <div 
       className={`ad-container my-6 py-3 w-full max-w-full overflow-hidden bg-gray-50 dark:bg-gray-800 rounded-lg ${className}`}
       data-placement-id={placementId}
-      data-pwa-mode={isInPWAMode ? 'true' : 'false'}
     >
-      <div className="text-center text-xs text-gray-500 mb-1">
-        Advertisement {isInPWAMode && import.meta.env.DEV && ' (PWA Mode)'}
-      </div>
+      <div className="text-center text-xs text-gray-500 mb-1">Advertisement</div>
       <div 
         ref={adRef} 
         className="w-full flex justify-center items-center min-h-[100px]"

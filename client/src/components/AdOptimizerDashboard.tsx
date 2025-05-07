@@ -15,8 +15,7 @@ export function AdOptimizerDashboard() {
     timeOnPage, 
     scrollDepth, 
     isAdBlockerDetected,
-    adsViewed,
-    isInPWAMode
+    adsViewed 
   } = useAdOptimizer();
   
   const [showDashboard, setShowDashboard] = useState(false);
@@ -63,19 +62,10 @@ export function AdOptimizerDashboard() {
     }));
   };
   
-  // Use a portal for the dashboard to prevent parent component layout shifts
   return (
-    <div 
-      className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4"
-      // Prevent event propagation to avoid rerenders of parent components
-      onClick={(e) => e.stopPropagation()}
-    >
-      <Card 
-        className="w-full max-w-4xl max-h-[90vh] overflow-auto"
-        // Prevent scrolling the main page when scrolling the dashboard
-        onScroll={(e) => e.stopPropagation()}
-      >
-        <CardHeader className="flex flex-row items-center justify-between sticky top-0 bg-white dark:bg-gray-900 z-10">
+    <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4">
+      <Card className="w-full max-w-4xl max-h-[90vh] overflow-auto">
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Ad Placement Optimizer</CardTitle>
           <Button 
             variant="outline" 
@@ -122,7 +112,7 @@ export function AdOptimizerDashboard() {
                 </Card>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <Card>
                   <CardContent className="pt-6">
                     <h3 className="font-medium text-sm mb-1">User Engagement</h3>
@@ -157,21 +147,6 @@ export function AdOptimizerDashboard() {
                     </div>
                   </CardContent>
                 </Card>
-                
-                <Card>
-                  <CardContent className="pt-6">
-                    <h3 className="font-medium text-sm mb-1">PWA Mode</h3>
-                    <div className={`text-lg font-bold ${isInPWAMode ? 'text-blue-500' : 'text-slate-500'}`}>
-                      {isInPWAMode ? 'Active' : 'Inactive'}
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      {isInPWAMode 
-                        ? 'App is running as installed PWA' 
-                        : 'App is running in browser'
-                      }
-                    </div>
-                  </CardContent>
-                </Card>
               </div>
               
               <div className="bg-slate-50 p-4 rounded-lg">
@@ -184,10 +159,6 @@ export function AdOptimizerDashboard() {
                   <div><strong>Device:</strong> {deviceType} - Formats prioritized: fluid, auto, horizontal</div>
                   <div><strong>Context:</strong> {contentContext} - Max ads: 3</div>
                   <div><strong>User:</strong> {userJourney.replace(/_/g, ' ')} - Frequency: moderate</div>
-                  <div className={isInPWAMode ? 'text-blue-500 font-medium mt-2' : 'mt-2'}>
-                    <strong>App Status:</strong> {isInPWAMode ? 'PWA Mode' : 'Browser Mode'} 
-                    {isInPWAMode && ' - Special ad handling is active'}
-                  </div>
                 </div>
               </div>
             </TabsContent>
