@@ -2,6 +2,66 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
 
+// PWA reload functionality - ensure fresh state when opening the app
+(function forceReloadForPWA() {
+  // Only run in standalone mode (installed PWA)
+  const isStandalone = 
+    window.matchMedia('(display-mode: standalone)').matches || 
+    window.navigator.standalone === true || 
+    document.referrer.includes('android-app://');
+  
+  if (isStandalone) {
+    console.log('PWA detected, setting up auto-refresh');
+    
+    // Check if this is a fresh opening of the app or just a refresh
+    const wasRecentlyOpened = sessionStorage.getItem('app_just_opened');
+    const currentTime = Date.now();
+    
+    if (!wasRecentlyOpened) {
+      // First time opening in this session - mark as opened
+      sessionStorage.setItem('app_just_opened', currentTime.toString());
+      
+      // Compare to the last time the app was opened
+      const lastOpened = localStorage.getItem('last_pwa_open');
+      
+      if (lastOpened) {
+        const timeSinceLast = currentTime - parseInt(lastOpened);
+        // If more than 30 seconds have passed since the last opening,
+        // consider this a new session and force reload for fresh content
+        if (timeSinceLast > 30000) {
+          console.log('New PWA session detected, forcing reload for fresh content');
+          localStorage.setItem('last_pwa_open', currentTime.toString());
+          // Force a cache-busting reload
+          window.location.reload(true);
+          return; // Stop execution since we're reloading
+        }
+      }
+    }
+    
+    // Update the last opened time
+    localStorage.setItem('last_pwa_open', currentTime.toString());
+    
+    // Handle app becoming visible again after being in background
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        const lastVisible = localStorage.getItem('last_visible');
+        const nowTime = Date.now();
+        
+        if (lastVisible) {
+          const timeSinceVisible = nowTime - parseInt(lastVisible);
+          // If app was in background for more than 5 minutes, reload
+          if (timeSinceVisible > 300000) {
+            console.log('App returning from background after long time, refreshing');
+            window.location.reload(true);
+          }
+        }
+        
+        localStorage.setItem('last_visible', nowTime.toString());
+      }
+    });
+  }
+})();
+
 // Load Font Awesome
 const script = document.createElement('script');
 script.src = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js";

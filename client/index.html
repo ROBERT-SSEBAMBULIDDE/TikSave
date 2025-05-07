@@ -33,6 +33,9 @@
     <!-- PWA Installer Script -->
     <script src="/pwa-installer.js"></script>
     
+    <!-- PWA Reload Script - Forces reload on app launch -->
+    <script src="/pwa-reload.js"></script>
+    
     <!-- PWA Install Button (hidden, we're using React components instead) -->
     <div 
       id="pwa-install-button-container" 
@@ -46,6 +49,28 @@
           navigator.serviceWorker.register('/sw.js')
             .then(function(registration) {
               console.log('ServiceWorker registration successful with scope: ', registration.scope);
+              
+              // Force reload for PWA mode
+              const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                (window.navigator.standalone === true) || 
+                document.referrer.includes('android-app://');
+                
+              // Check if this is a PWA launch
+              if (isStandalone) {
+                // Create or get a session timestamp
+                const lastVisit = sessionStorage.getItem('pwa_last_visit');
+                const currentTime = Date.now();
+                
+                // Check if this is a new session (more than 5 minutes since last activity)
+                if (!lastVisit || (currentTime - parseInt(lastVisit)) > 300000) {
+                  console.log('New PWA session detected, forcing reload');
+                  // Clear any existing cache before reloading
+                  window.location.reload(true);
+                }
+                
+                // Update the timestamp
+                sessionStorage.setItem('pwa_last_visit', currentTime.toString());
+              }
             })
             .catch(function(error) {
               console.log('ServiceWorker registration failed: ', error);
