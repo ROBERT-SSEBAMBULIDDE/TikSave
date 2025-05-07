@@ -2,7 +2,7 @@
   "name": "TikSave by SamaBrains",
   "short_name": "TikSave",
   "description": "A TikTok video downloader without watermarks",
-  "start_url": "/",
+  "start_url": "/?pwa_reload=true",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#1d4ed8",

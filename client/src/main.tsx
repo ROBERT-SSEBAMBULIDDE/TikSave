@@ -7,7 +7,8 @@ import "./index.css";
   // Only run in standalone mode (installed PWA)
   const isStandalone = 
     window.matchMedia('(display-mode: standalone)').matches || 
-    window.navigator.standalone === true || 
+    // @ts-ignore - Safari specific property 
+    (window.navigator as any).standalone === true || 
     document.referrer.includes('android-app://');
   
   if (isStandalone) {
@@ -32,7 +33,7 @@ import "./index.css";
           console.log('New PWA session detected, forcing reload for fresh content');
           localStorage.setItem('last_pwa_open', currentTime.toString());
           // Force a cache-busting reload
-          window.location.reload(true);
+          window.location.reload();
           return; // Stop execution since we're reloading
         }
       }
@@ -52,7 +53,7 @@ import "./index.css";
           // If app was in background for more than 5 minutes, reload
           if (timeSinceVisible > 300000) {
             console.log('App returning from background after long time, refreshing');
-            window.location.reload(true);
+            window.location.reload();
           }
         }
         
