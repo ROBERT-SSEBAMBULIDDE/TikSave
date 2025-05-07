@@ -18,7 +18,12 @@ export function AdUnit({
   fallbackContent
 }: AdUnitProps) {
   const adRef = useRef<HTMLDivElement>(null);
-  const { optimizeAd, recordAdImpression, isAdBlockerDetected } = useAdOptimizer();
+  const { 
+    optimizeAd, 
+    recordAdImpression, 
+    isAdBlockerDetected, 
+    isInPWAMode 
+  } = useAdOptimizer();
   const [isLoaded, setIsLoaded] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   
@@ -91,6 +96,18 @@ export function AdUnit({
           ins.setAttribute('data-ad-slot', finalSlot);
           ins.setAttribute('data-full-width-responsive', 'true');
           
+          // Add PWA-specific attribute if in PWA mode
+          if (isInPWAMode) {
+            ins.setAttribute('data-pwa-version', 'true');
+            
+            // In PWA mode, force more aggressive ad refreshing
+            ins.setAttribute('data-adtest', 'on');
+            
+            // Add timestamp to prevent potential caching issues in PWA
+            const timestamp = new Date().getTime();
+            ins.setAttribute('data-pwa-timestamp', timestamp.toString());
+          }
+          
           // Add the ins element to our ref
           adRef.current.appendChild(ins);
           
@@ -105,6 +122,21 @@ export function AdUnit({
               if (isVisible) {
                 recordAdImpression();
               }
+            } else if (isInPWAMode) {
+              // In PWA mode, if adsbygoogle isn't available, try to reload the ad script
+              const script = document.createElement('script');
+              script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6859477325721314';
+              script.async = true;
+              script.crossOrigin = 'anonymous';
+              document.head.appendChild(script);
+              
+              // Try again after script loads
+              script.onload = () => {
+                if ((window as any).adsbygoogle) {
+                  (window as any).adsbygoogle.push({});
+                  setIsLoaded(true);
+                }
+              };
             }
           } catch (error) {
             console.error('AdSense push error:', error);
@@ -146,7 +178,7 @@ export function AdUnit({
       clearTimeout(resizeTimer);
       window.removeEventListener('resize', handleResize);
     };
-  }, [finalFormat, finalSlot, isVisible, recordAdImpression, show]);
+  }, [finalFormat, finalSlot, isVisible, recordAdImpression, show, isInPWAMode]);
   
   // If optimizer decides not to show the ad or if ad blocker is detected
   if (!show || isAdBlockerDetected) {
@@ -162,8 +194,11 @@ export function AdUnit({
     <div 
       className={`ad-container my-6 py-3 w-full max-w-full overflow-hidden bg-gray-50 dark:bg-gray-800 rounded-lg ${className}`}
       data-placement-id={placementId}
+      data-pwa-mode={isInPWAMode ? 'true' : 'false'}
     >
-      <div className="text-center text-xs text-gray-500 mb-1">Advertisement</div>
+      <div className="text-center text-xs text-gray-500 mb-1">
+        Advertisement {isInPWAMode && import.meta.env.DEV && ' (PWA Mode)'}
+      </div>
       <div 
         ref={adRef} 
         className="w-full flex justify-center items-center min-h-[100px]"
