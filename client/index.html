@@ -89,12 +89,79 @@
           navigator.serviceWorker.register('/sw.js')
             .then(function(registration) {
               console.log('ServiceWorker registration successful with scope: ', registration.scope);
+              // Skip waiting to activate new service worker if available
+              if (registration.waiting) {
+                registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+              }
             })
             .catch(function(error) {
               console.log('ServiceWorker registration failed: ', error);
             });
         });
       }
+    </script>
+    
+    <!-- Ad blocker script -->
+    <script>
+      window.addEventListener('DOMContentLoaded', function() {
+        function removeAds() {
+          // Remove "Advertisement" text nodes
+          const walker = document.createTreeWalker(
+            document.body,
+            NodeFilter.SHOW_TEXT,
+            null,
+            false
+          );
+
+          const nodesToRemove = [];
+          let node;
+          
+          while(node = walker.nextNode()) {
+            if (node.nodeValue && node.nodeValue.trim() === 'Advertisement') {
+              // Find parent container and remove it
+              let parent = node.parentNode;
+              let depth = 0;
+              // Try to find a significant container (go up 3 levels max)
+              while (parent && depth < 3) {
+                if (parent.tagName === 'DIV' || parent.tagName === 'SECTION' || parent.tagName === 'ASIDE') {
+                  nodesToRemove.push(parent);
+                  break;
+                }
+                parent = parent.parentNode;
+                depth++;
+              }
+              
+              if (depth >= 3) {
+                // If we couldn't find a good container, at least hide the text
+                nodesToRemove.push(node.parentNode);
+              }
+            }
+          }
+          
+          // Remove ad elements
+          nodesToRemove.forEach(function(element) {
+            if (element && element.parentNode) {
+              element.parentNode.removeChild(element);
+            }
+          });
+          
+          // Set a timer to check again (ads might load dynamically)
+          setTimeout(removeAds, 1000);
+        }
+        
+        // Run initially and set up observer
+        removeAds();
+        
+        // Watch for dynamic content changes
+        const observer = new MutationObserver(function(mutations) {
+          removeAds();
+        });
+        
+        observer.observe(document.body, { 
+          childList: true, 
+          subtree: true 
+        });
+      });
     </script>
   </body>
 </html>

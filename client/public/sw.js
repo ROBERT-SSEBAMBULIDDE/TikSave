@@ -1,6 +1,6 @@
 // Service Worker for TikSave PWA
 
-const CACHE_NAME = 'tiksave-v4';
+const CACHE_NAME = 'tiksave-v5';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -57,6 +57,27 @@ self.addEventListener('message', (event) => {
 
 // Serve cached content when offline
 self.addEventListener('fetch', event => {
+  // Block ad requests
+  const url = event.request.url.toLowerCase();
+  const adPatterns = [
+    'googleads', 
+    'doubleclick', 
+    'adsense', 
+    'adservice', 
+    'analytics', 
+    'pagead', 
+    'adsbygoogle',
+    'ad-', 
+    '/ads/',
+    'advertisement'
+  ];
+  
+  // If the request matches any ad pattern, return an empty response
+  if (adPatterns.some(pattern => url.includes(pattern))) {
+    event.respondWith(new Response('', { status: 200 }));
+    return;
+  }
+  
   event.respondWith(
     caches.match(event.request)
       .then(response => {

@@ -131,3 +131,32 @@
   top: 0;
   left: 0;
 }
+
+/* Hide ad elements */
+[id*="google_ads"],
+[id*="ad-"],
+[id*="ad_"],
+[class*="ad-container"],
+[class*="ad-wrapper"],
+[class*="ad-slot"],
+[class*="advert"],
+[class*="banner-ad"],
+[class*="dfp-"],
+[class*="adsense"],
+div:has(> span:contains("Advertisement")),
+div:has(> div:contains("Advertisement")),
+div:has(> p:contains("Advertisement")) {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  width: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Hide specific advertisement label */
+div:has(> span:only-child:contains("Advertisement")),
+[aria-label="Advertisement"],
+div[data-text="Advertisement"] {
+  display: none !important;
+}

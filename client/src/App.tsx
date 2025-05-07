@@ -10,6 +10,7 @@ import Privacy from "@/pages/privacy";
 import HowItWorks from "@/pages/howitworks";
 import { ThemeProvider } from "./providers/ThemeProvider";
 import { DirectInstallButton } from "@/components/DirectInstallButton";
+import { useEffect } from "react";
 
 function Router() {
   return (
