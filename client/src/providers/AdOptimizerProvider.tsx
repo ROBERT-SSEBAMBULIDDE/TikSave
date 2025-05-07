@@ -59,8 +59,8 @@ interface AdOptimizerProviderProps {
 }
 
 // Ad Optimizer Provider component
-// Use React.memo for the provider component to prevent unnecessary rerenders
-export const AdOptimizerProvider = React.memo(function AdOptimizerProvider({ children }: AdOptimizerProviderProps) {
+// Define the provider component
+function AdOptimizerProviderComponent({ children }: AdOptimizerProviderProps) {
   const [location] = useLocation();
   // Use useMemo to prevent recalculating these values on every render
   const initialDeviceType = React.useMemo(() => detectDeviceType(), []);
@@ -271,3 +271,6 @@ export function useAdOptimizer() {
   
   return context;
 }
+
+// Export the memoized provider
+export const AdOptimizerProvider = React.memo(AdOptimizerProviderComponent);
