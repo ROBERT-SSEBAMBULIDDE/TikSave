@@ -9,6 +9,9 @@ import Terms from "@/pages/terms";
 import Privacy from "@/pages/privacy";
 import HowItWorks from "@/pages/howitworks";
 import { ThemeProvider } from "./providers/ThemeProvider";
+import { EnhancedInstallBanner } from "@/components/EnhancedInstallBanner";
+import { OfflineNotification } from "@/components/OfflineNotification";
+import { UpdateNotification } from "@/components/UpdateNotification";
 
 function Router() {
   return (
@@ -28,6 +31,9 @@ function App() {
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
+          <OfflineNotification />
+          <EnhancedInstallBanner />
+          <UpdateNotification />
           <Toaster />
           <Router />
         </TooltipProvider>

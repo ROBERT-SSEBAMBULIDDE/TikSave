@@ -1,12 +1,15 @@
 {
   "name": "TikSave by SamaBrains",
   "short_name": "TikSave",
-  "description": "A TikTok video downloader without watermarks",
-  "start_url": "/?pwa_reload=true",
+  "description": "Download TikTok videos without watermarks. Fast, free, and high quality downloads.",
+  "start_url": "/?pwa=true",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
   "background_color": "#ffffff",
   "theme_color": "#1d4ed8",
   "orientation": "portrait",
+  "scope": "/",
+  "categories": ["entertainment", "utilities", "productivity"],
   "icons": [
     {
       "src": "/icons/icon-72x72.png",
