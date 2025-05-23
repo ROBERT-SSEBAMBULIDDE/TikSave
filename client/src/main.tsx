@@ -14,15 +14,14 @@ import "./index.css";
   if (isStandalone) {
     console.log('PWA detected, setting up auto-refresh');
     
-    // Check if this is a fresh opening of the app or just a refresh
-    const wasRecentlyOpened = sessionStorage.getItem('app_just_opened');
-    const currentTime = Date.now();
+    // Check if we've already processed this session
+    const sessionProcessed = sessionStorage.getItem('pwa_session_processed');
     
-    if (!wasRecentlyOpened) {
-      // First time opening in this session - mark as opened
-      sessionStorage.setItem('app_just_opened', currentTime.toString());
+    if (!sessionProcessed) {
+      // Mark this session as processed to prevent infinite reloads
+      sessionStorage.setItem('pwa_session_processed', 'true');
       
-      // Compare to the last time the app was opened
+      const currentTime = Date.now();
       const lastOpened = localStorage.getItem('last_pwa_open');
       
       if (lastOpened) {
@@ -36,11 +35,11 @@ import "./index.css";
           window.location.reload();
           return; // Stop execution since we're reloading
         }
+      } else {
+        // First time ever - just set the timestamp
+        localStorage.setItem('last_pwa_open', currentTime.toString());
       }
     }
-    
-    // Update the last opened time
-    localStorage.setItem('last_pwa_open', currentTime.toString());
     
     // Handle app becoming visible again after being in background
     document.addEventListener('visibilitychange', () => {
