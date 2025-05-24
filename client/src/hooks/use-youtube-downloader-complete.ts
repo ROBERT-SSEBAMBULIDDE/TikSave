@@ -120,7 +120,7 @@ export function useYouTubeDownloaderComplete() {
   };
 
   const pollDownloadProgress = async (jobId: string) => {
-    const maxAttempts = 60; // 5 minutes max
+    const maxAttempts = 120; // 10 minutes max (faster polling)
     let attempts = 0;
 
     const poll = async () => {
@@ -132,15 +132,19 @@ export function useYouTubeDownloaderComplete() {
           throw new Error(result.error || "Progress check failed");
         }
 
-        const progressPercent = Math.min(50 + (result.progress || 0) / 2, 95);
+        // More accurate progress tracking
+        const baseProgress = 20; // Already started
+        const apiProgress = result.progress || 0;
+        const progressPercent = Math.min(baseProgress + (apiProgress * 0.75), 95);
+        
         setProcessing({ 
           progress: progressPercent, 
-          message: result.status === 'completed' ? "Finalizing download..." : "Processing YouTube video..."
+          message: result.status === 'completed' ? "Download ready! Starting download..." : `Processing video... ${Math.round(apiProgress)}%`
         });
 
         if (result.status === 'completed' && result.downloadUrl) {
           // Download completed
-          setProcessing({ progress: 100, message: "Download ready!" });
+          setProcessing({ progress: 100, message: "Download starting..." });
           
           // Save to history
           if (videoData) {
@@ -156,11 +160,13 @@ export function useYouTubeDownloaderComplete() {
             });
           }
 
-          // Trigger download
+          // Trigger immediate download
           const link = document.createElement('a');
           link.href = result.downloadUrl;
-          link.download = `${videoData?.title || 'youtube-video'}.${selectedFormat}`;
+          link.download = `${videoData?.title?.replace(/[^a-zA-Z0-9]/g, '_') || 'youtube-video'}.${selectedFormat}`;
+          document.body.appendChild(link);
           link.click();
+          document.body.removeChild(link);
 
           // Reset after successful download
           setTimeout(() => {
@@ -168,16 +174,17 @@ export function useYouTubeDownloaderComplete() {
             setUrl("");
             setVideoData(null);
             setDownloadJobId(null);
-          }, 2000);
+          }, 1500);
 
         } else if (result.status === 'error') {
           throw new Error(result.error || "Download failed");
         } else if (attempts < maxAttempts) {
-          // Continue polling
+          // Continue polling - faster intervals for quicker response
           attempts++;
-          setTimeout(poll, 5000); // Poll every 5 seconds
+          const pollInterval = attempts < 20 ? 2000 : attempts < 40 ? 3000 : 4000; // Start fast, then slow down
+          setTimeout(poll, pollInterval);
         } else {
-          throw new Error("Download timeout - please try again");
+          throw new Error("Download took too long - please try again with a shorter video");
         }
 
       } catch (err) {
