@@ -44,8 +44,13 @@ app.use((req, res, next) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
-    res.status(status).json({ message });
-    throw err;
+    console.error("Express error handler:", err);
+    
+    if (!res.headersSent) {
+      res.status(status).json({ message });
+    }
+    
+    // Don't throw the error after sending response - this would crash the server
   });
 
   // importantly only setup vite in development and after
@@ -71,13 +76,13 @@ app.use((req, res, next) => {
     // Run initial cleanup
     cleanupTempFiles();
     
-    // Schedule cleanup to run every hour
+    // Schedule cleanup to run every 30 minutes for better file management
     setInterval(() => {
       try {
         cleanupTempFiles();
       } catch (err) {
         console.error('Scheduled cleanup error:', err);
       }
-    }, 60 * 60 * 1000); // 1 hour
+    }, 30 * 60 * 1000); // 30 minutes
   });
 })();

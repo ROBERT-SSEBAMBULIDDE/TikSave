@@ -116,7 +116,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Stream the file to the client
       const fileStream = fs.createReadStream(filePath);
-      fileStream.pipe(res);
       
       // Handle errors during file streaming
       fileStream.on("error", (error) => {
@@ -125,6 +124,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           res.status(500).json({ message: "Error streaming file" });
         }
       });
+      
+      // Clean up file stream on response end
+      res.on('close', () => {
+        fileStream.destroy();
+      });
+      
+      fileStream.pipe(res);
       
       // Files will be cleaned up by the scheduled cleanup process
       // No need to delete immediately after streaming

@@ -108,13 +108,18 @@ export async function getTikTokVideoInfo(url: string): Promise<VideoData> {
   try {
     console.log('Fetching TikTok video info from RapidAPI...');
     
+    // Check if API key is available
+    if (!RAPID_API_KEY) {
+      throw new Error('RAPID_API_KEY environment variable is not configured. Please provide your RapidAPI key.');
+    }
+    
     // Use RapidAPI to get video info without watermark
     const response = await fetch(`https://${RAPID_API_HOST}/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         'x-rapidapi-host': RAPID_API_HOST,
-        'x-rapidapi-key': RAPID_API_KEY || ''
+        'x-rapidapi-key': RAPID_API_KEY
       },
       body: new URLSearchParams({
         url,
@@ -187,13 +192,18 @@ async function downloadTikTokVideo(url: string, videoId: string): Promise<string
   console.log('Downloading TikTok video without watermark...');
   
   try {
+    // Check if API key is available
+    if (!RAPID_API_KEY) {
+      throw new Error('RAPID_API_KEY environment variable is not configured. Please provide your RapidAPI key.');
+    }
+    
     // Get video info with download links from RapidAPI
     const response = await fetch(`https://${RAPID_API_HOST}/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         'x-rapidapi-host': RAPID_API_HOST,
-        'x-rapidapi-key': RAPID_API_KEY || ''
+        'x-rapidapi-key': RAPID_API_KEY
       },
       body: new URLSearchParams({
         url,
@@ -215,14 +225,18 @@ async function downloadTikTokVideo(url: string, videoId: string): Promise<string
     const videoUrl = data.data.play;
     const tempFilePath = path.join(TMP_DIR, `${videoId}_original.mp4`);
     
-    // Download the video
+    // Download the video with proper error handling
     const videoResponse = await fetch(videoUrl);
     if (!videoResponse.ok) {
       throw new Error(`Failed to download video: ${videoResponse.statusText}`);
     }
     
+    if (!videoResponse.body) {
+      throw new Error('No video data received from server');
+    }
+    
     const fileStream = createWriteStream(tempFilePath);
-    await pipeline(videoResponse.body!, fileStream);
+    await pipeline(videoResponse.body, fileStream);
     
     console.log('Successfully downloaded TikTok video without watermark');
     return tempFilePath;
@@ -413,13 +427,13 @@ export async function processTikTokVideo(
 // Use fs import at the top level
 import * as fs from 'fs';
 
-// Clean up temporary files older than 6 hours
+// Clean up temporary files older than 2 hours (more aggressive cleanup)
 export function cleanupTempFiles() {
   console.log('Cleaning up temporary files...');
   try {
     const files = fs.readdirSync(TMP_DIR);
     const now = Date.now();
-    const sixHoursInMs = 6 * 60 * 60 * 1000;
+    const twoHoursInMs = 2 * 60 * 60 * 1000; // Reduced from 6 hours to 2 hours
     
     let deletedCount = 0;
     
@@ -429,8 +443,8 @@ export function cleanupTempFiles() {
         const stats = fs.statSync(filePath);
         const fileAge = now - stats.mtimeMs;
         
-        // Delete files older than 6 hours
-        if (fileAge > sixHoursInMs) {
+        // Delete files older than 2 hours
+        if (fileAge > twoHoursInMs) {
           fs.unlinkSync(filePath);
           deletedCount++;
           
