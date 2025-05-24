@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlatformSelector } from "./PlatformSelector";
 import { UniversalDownloaderForm } from "./UniversalDownloaderForm";
 import { useTikTokDownloader } from "@/hooks/use-tiktok-downloader";
-// import { useYouTubeDownloader } from "@/hooks/use-youtube-downloader";
+import { useYouTubeDownloaderComplete } from "@/hooks/use-youtube-downloader-complete";
 import { ProcessingState } from "./ProcessingState";
 import { ResultsState } from "./ResultsState";
 import { ErrorState } from "./ErrorState";
@@ -14,56 +14,8 @@ export function UniversalDownloaderCard() {
   // TikTok downloader hook
   const tikTokDownloader = useTikTokDownloader();
   
-  // YouTube downloader state
-  const [youtubeUrl, setYoutubeUrl] = useState("");
-  
-  const youTubeDownloader = {
-    url: youtubeUrl,
-    setUrl: setYoutubeUrl,
-    selectedFormat: "mp4" as const,
-    selectedQuality: "high" as const,
-    handleFormatSelect: () => {},
-    handleQualitySelect: () => {},
-    handleSubmit: async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!youtubeUrl.trim()) {
-        alert("Please enter a YouTube URL");
-        return;
-      }
-      
-      try {
-        // Get video info first
-        const response = await fetch("/api/youtube/info", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: youtubeUrl })
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to get video information");
-        }
-
-        const videoData = await response.json();
-        
-        // Show success message and reset form
-        alert(`✅ YouTube video detected successfully!\n\nVideo ID: ${videoData.id}\nTitle: ${videoData.title}\n\nYouTube integration is working perfectly!`);
-        
-        // Reset the form
-        setYoutubeUrl("");
-        
-      } catch (error) {
-        alert("Error processing YouTube URL. Please check the URL and try again.");
-      }
-    },
-    state: "initial" as const,
-    processing: { progress: 0, message: "" },
-    videoData: null,
-    error: null,
-    handleDownload: async () => {},
-    handleReset: () => {
-      setYoutubeUrl("");
-    }
-  };
+  // YouTube downloader with complete functionality
+  const youTubeDownloader = useYouTubeDownloaderComplete();
 
   // Use the appropriate downloader based on selected platform
   const currentDownloader = selectedPlatform === "tiktok" ? tikTokDownloader : youTubeDownloader;
@@ -82,7 +34,7 @@ export function UniversalDownloaderCard() {
     if (selectedPlatform === "tiktok") {
       tikTokDownloader.handleUrlChange(e);
     } else {
-      setYoutubeUrl(newUrl);
+      youTubeDownloader.setUrl(newUrl);
     }
   };
 

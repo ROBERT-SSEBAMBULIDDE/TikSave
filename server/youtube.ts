@@ -26,6 +26,12 @@ interface YouTubeProgressResponse {
 const youtubeJobs = new Map<string, any>();
 
 export async function getYouTubeVideoInfo(url: string): Promise<VideoData> {
+  const rapidApiKey = process.env.RAPIDAPI_KEY;
+  
+  if (!rapidApiKey) {
+    throw new Error('YouTube service is not configured.');
+  }
+
   try {
     // Extract video ID from YouTube URL
     const videoId = extractYouTubeVideoId(url);
@@ -33,17 +39,32 @@ export async function getYouTubeVideoInfo(url: string): Promise<VideoData> {
       throw new Error('Invalid YouTube URL. Please check the URL and try again.');
     }
 
-    // Create video info using YouTube's thumbnail API and video ID
-    const title = `YouTube Video ${videoId}`;
-    const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+    // Get authentic video information from YouTube API
+    const response = await fetch(`https://youtube-mp4-mp3-downloader.p.rapidapi.com/api/v1/info?id=${videoId}`, {
+      method: 'GET',
+      headers: {
+        'X-RapidAPI-Key': rapidApiKey,
+        'X-RapidAPI-Host': 'youtube-mp4-mp3-downloader.p.rapidapi.com'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`YouTube API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    if (!data.success) {
+      throw new Error('Failed to get video information from YouTube');
+    }
 
     return {
       id: videoId,
       url: url,
-      title: title,
-      author: 'YouTube Channel',
-      thumbnailUrl: thumbnailUrl,
-      duration: undefined
+      title: data.title || `YouTube Video ${videoId}`,
+      author: data.channel || 'YouTube Channel',
+      thumbnailUrl: data.thumbnail || `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+      duration: data.duration ? parseDuration(data.duration) : undefined
     };
 
   } catch (error) {
