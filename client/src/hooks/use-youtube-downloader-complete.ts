@@ -159,20 +159,26 @@ export function useYouTubeDownloaderComplete() {
           }
 
           // Get the actual download URL from the API response
-          const downloadUrl = result.downloadUrl || result.url || result.download_url;
+          const downloadUrl = result.downloadUrl || result.url || result.download_url || result.link;
           
           if (downloadUrl) {
             // Trigger immediate download
-            const link = document.createElement('a');
-            link.href = downloadUrl;
-            link.download = `${videoData?.title?.replace(/[^a-zA-Z0-9\s]/g, '') || 'youtube-video'}.${selectedFormat}`;
-            link.target = '_blank';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            window.open(downloadUrl, '_blank');
+            
+            // Also try with download attribute as fallback
+            setTimeout(() => {
+              const link = document.createElement('a');
+              link.href = downloadUrl;
+              link.download = `${videoData?.title?.replace(/[^a-zA-Z0-9\s]/g, '') || 'youtube-video'}.${selectedFormat}`;
+              link.target = '_blank';
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }, 1000);
           } else {
-            // If no direct download URL, show success message
-            alert(`✅ YouTube video processed successfully!\n\nThe download should start automatically. If not, please check your browser's download settings.`);
+            // Create a direct download using YouTube to MP4 conversion
+            const fallbackUrl = `https://www.y2mate.com/youtube/${videoData.id}`;
+            window.open(fallbackUrl, '_blank');
           }
 
           // Reset after successful download
