@@ -129,15 +129,14 @@ export function useYouTubeDownloaderComplete() {
         }
 
         // More accurate progress tracking
-        const baseProgress = 20; // Already started
         const apiProgress = result.progress || 0;
         // Handle progress values that might be 1000 (100%) or normal percentage
         const normalizedProgress = apiProgress > 100 ? 100 : apiProgress;
-        const progressPercent = result.status === 'completed' ? 100 : Math.min(baseProgress + (normalizedProgress * 0.75), 95);
+        const progressPercent = result.status === 'completed' ? 100 : normalizedProgress;
         
         setProcessing({ 
           progress: progressPercent, 
-          message: result.status === 'completed' ? "Download ready! Starting download..." : `Processing video... ${Math.round(apiProgress)}%`
+          message: result.status === 'completed' ? "Download ready! Starting download..." : `Processing video... ${Math.round(normalizedProgress)}%`
         });
 
         if (result.status === 'completed') {

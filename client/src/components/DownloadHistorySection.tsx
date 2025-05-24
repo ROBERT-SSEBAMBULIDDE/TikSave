@@ -209,14 +209,24 @@ export function DownloadHistorySection() {
                   </div>
                 </div>
                 
-                <Button 
-                  variant="default" 
-                  className="w-full mt-3 text-xs sm:text-sm py-1 h-8"
-                  onClick={() => handleRedownload(download)}
-                >
-                  <ArrowDown size={14} className="mr-1 sm:mr-2" />
-                  Download Again
-                </Button>
+                <div className="flex gap-2 mt-3">
+                  <Button 
+                    variant="outline" 
+                    className="flex-1 text-xs py-1 h-8"
+                    onClick={() => window.open(download.videoUrl, '_blank')}
+                    title="Play video"
+                  >
+                    ▶️ Play
+                  </Button>
+                  <Button 
+                    variant="default" 
+                    className="flex-1 text-xs py-1 h-8"
+                    onClick={() => handleRedownload(download)}
+                    title="Save video again"
+                  >
+                    💾 Save
+                  </Button>
+                </div>
               </div>
             </Card>
           ))}
