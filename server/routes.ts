@@ -47,6 +47,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // TikTok Video Download Route
   app.get("/api/tiktok/download", async (req: Request, res: Response) => {
     try {
+      // Check if this is actually a TikTok URL
+      const videoUrl = req.query.videoUrl as string;
+      if (videoUrl && (!videoUrl.includes('tiktok.com') && !videoUrl.includes('vm.tiktok.com'))) {
+        return res.status(400).json({ error: "This endpoint only supports TikTok URLs" });
+      }
+
       // Validate query parameters
       const validatedData = downloadOptionsSchema.parse({
         videoId: req.query.videoId,
@@ -55,7 +61,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       // Additional required parameters for download history
-      const videoUrl = req.query.videoUrl as string;
       const thumbnailUrl = req.query.thumbnailUrl as string;
       const title = req.query.title as string;
       const author = req.query.author as string;
