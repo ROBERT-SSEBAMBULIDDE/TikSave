@@ -181,6 +181,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // YouTube routes
+  app.post("/api/youtube/info", async (req: Request, res: Response) => {
+    try {
+      const { url } = req.body;
+      
+      if (!url) {
+        return res.status(400).json({ error: "YouTube URL is required" });
+      }
+
+      const videoData = await getYouTubeVideoInfo(url);
+      res.json(videoData);
+    } catch (error) {
+      console.error("YouTube info error:", error);
+      const message = error instanceof Error ? error.message : "Failed to get YouTube video information";
+      res.status(500).json({ error: message });
+    }
+  });
+
+  app.post("/api/youtube/download", async (req: Request, res: Response) => {
+    try {
+      const { url, videoId, format, quality } = req.body;
+      
+      if (!url || !videoId || !format || !quality) {
+        return res.status(400).json({ error: "Missing required parameters" });
+      }
+
+      const result = await processYouTubeVideo(url, videoId, format, quality);
+      res.json(result);
+    } catch (error) {
+      console.error("YouTube download error:", error);
+      const message = error instanceof Error ? error.message : "Failed to start YouTube download";
+      res.status(500).json({ error: message });
+    }
+  });
+
+  app.get("/api/youtube/progress/:jobId", async (req: Request, res: Response) => {
+    try {
+      const { jobId } = req.params;
+      
+      if (!jobId) {
+        return res.status(400).json({ error: "Job ID is required" });
+      }
+
+      const progress = await getYouTubeProgress(jobId);
+      res.json(progress);
+    } catch (error) {
+      console.error("YouTube progress error:", error);
+      const message = error instanceof Error ? error.message : "Failed to get download progress";
+      res.status(500).json({ error: message });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;
