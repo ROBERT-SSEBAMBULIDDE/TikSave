@@ -39,14 +39,25 @@ export async function getYouTubeVideoInfo(url: string): Promise<VideoData> {
       throw new Error('Invalid YouTube URL. Please check the URL and try again.');
     }
 
-    // Get authentic video information from YouTube API using video ID
-    const response = await fetch(`https://youtube-mp4-mp3-downloader.p.rapidapi.com/api/v1/download?format=720&id=${videoId}&audioQuality=128&addInfo=true`, {
+    // Try to get video info first with a basic info endpoint
+    let response = await fetch(`https://youtube-mp4-mp3-downloader.p.rapidapi.com/api/v1/info?id=${videoId}`, {
       method: 'GET',
       headers: {
         'X-RapidAPI-Key': rapidApiKey,
         'X-RapidAPI-Host': 'youtube-mp4-mp3-downloader.p.rapidapi.com'
       }
     });
+
+    // If that fails, try the download endpoint with addInfo=true
+    if (!response.ok) {
+      response = await fetch(`https://youtube-mp4-mp3-downloader.p.rapidapi.com/api/v1/download?format=720&id=${videoId}&audioQuality=128&addInfo=true`, {
+        method: 'GET',
+        headers: {
+          'X-RapidAPI-Key': rapidApiKey,
+          'X-RapidAPI-Host': 'youtube-mp4-mp3-downloader.p.rapidapi.com'
+        }
+      });
+    }
 
     if (!response.ok) {
       throw new Error(`YouTube API error: ${response.status}`);
