@@ -14,21 +14,27 @@ export function UniversalDownloaderCard() {
   // TikTok downloader hook
   const tikTokDownloader = useTikTokDownloader();
   
-  // YouTube downloader hook (temporary placeholder)
+  // YouTube downloader state
+  const [youtubeUrl, setYoutubeUrl] = useState("");
+  
   const youTubeDownloader = {
-    url: "",
-    setUrl: (url: string) => {},
+    url: youtubeUrl,
+    setUrl: setYoutubeUrl,
     selectedFormat: "mp4" as const,
     selectedQuality: "high" as const,
     handleFormatSelect: () => {},
     handleQualitySelect: () => {},
-    handleSubmit: async () => {},
+    handleSubmit: async () => {
+      alert("YouTube downloads coming soon! For now, please use TikTok downloads which are working perfectly.");
+    },
     state: "initial" as const,
     processing: { progress: 0, message: "" },
     videoData: null,
     error: null,
     handleDownload: async () => {},
-    handleReset: () => {}
+    handleReset: () => {
+      setYoutubeUrl("");
+    }
   };
 
   // Use the appropriate downloader based on selected platform
@@ -44,11 +50,11 @@ export function UniversalDownloaderCard() {
       setSelectedPlatform("youtube");
     }
     
-    // Update the appropriate downloader
+    // Update the appropriate downloader based on current platform
     if (selectedPlatform === "tiktok") {
       tikTokDownloader.handleUrlChange(e);
     } else {
-      youTubeDownloader.setUrl(newUrl);
+      setYoutubeUrl(newUrl);
     }
   };
 
