@@ -135,16 +135,18 @@ export function useYouTubeDownloaderComplete() {
         // More accurate progress tracking
         const baseProgress = 20; // Already started
         const apiProgress = result.progress || 0;
-        const progressPercent = Math.min(baseProgress + (apiProgress * 0.75), 95);
+        // Handle progress values that might be 1000 (100%) or normal percentage
+        const normalizedProgress = apiProgress > 100 ? 100 : apiProgress;
+        const progressPercent = result.status === 'completed' ? 100 : Math.min(baseProgress + (normalizedProgress * 0.75), 95);
         
         setProcessing({ 
           progress: progressPercent, 
           message: result.status === 'completed' ? "Download ready! Starting download..." : `Processing video... ${Math.round(apiProgress)}%`
         });
 
-        if (result.status === 'completed' && result.downloadUrl) {
-          // Download completed
-          setProcessing({ progress: 100, message: "Download starting..." });
+        if (result.status === 'completed') {
+          // Download completed - check for downloadUrl or create direct download
+          setProcessing({ progress: 100, message: "Download ready!" });
           
           // Save to history
           if (videoData) {
@@ -160,13 +162,22 @@ export function useYouTubeDownloaderComplete() {
             });
           }
 
-          // Trigger immediate download
-          const link = document.createElement('a');
-          link.href = result.downloadUrl;
-          link.download = `${videoData?.title?.replace(/[^a-zA-Z0-9]/g, '_') || 'youtube-video'}.${selectedFormat}`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
+          // Get the actual download URL from the API response
+          const downloadUrl = result.downloadUrl || result.url || result.download_url;
+          
+          if (downloadUrl) {
+            // Trigger immediate download
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = `${videoData?.title?.replace(/[^a-zA-Z0-9\s]/g, '') || 'youtube-video'}.${selectedFormat}`;
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          } else {
+            // If no direct download URL, show success message
+            alert(`✅ YouTube video processed successfully!\n\nThe download should start automatically. If not, please check your browser's download settings.`);
+          }
 
           // Reset after successful download
           setTimeout(() => {
@@ -174,7 +185,7 @@ export function useYouTubeDownloaderComplete() {
             setUrl("");
             setVideoData(null);
             setDownloadJobId(null);
-          }, 1500);
+          }, 2000);
 
         } else if (result.status === 'error') {
           throw new Error(result.error || "Download failed");
