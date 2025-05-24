@@ -167,7 +167,7 @@ export async function getYouTubeProgress(jobId: string): Promise<YouTubeProgress
       id: jobId,
       status: data.finished ? 'completed' : 'processing',
       progress: data.progress || 0,
-      downloadUrl: data.downloadUrl || data.url || data.download_url || data.link || undefined,
+      downloadUrl: data.downloadUrl || data.url || data.download_url || data.link || data.file || data.result || undefined,
       error: data.error || undefined
     };
     
