@@ -2,19 +2,13 @@ import { Button } from "@/components/ui/button";
 import { FAIcon } from "@/components/ui/fa-icon";
 import { VideoData, DownloadFormat, VideoQuality } from "@/lib/types";
 import { useState, useRef, useEffect } from "react";
-import { WatermarkCaptionControls } from './WatermarkCaptionControls';
-import { SocialShareControls } from './SocialShareControls';
 
 interface ResultsStateProps {
   videoData: VideoData;
   selectedFormat: DownloadFormat;
   selectedQuality: VideoQuality;
-  watermarkOptions: any;
-  captionOptions: any;
   onFormatSelect: (format: DownloadFormat) => void;
   onQualitySelect: (quality: VideoQuality) => void;
-  onWatermarkChange: (options: any) => void;
-  onCaptionChange: (options: any) => void;
   onDownload: () => Promise<void>;
 }
 
@@ -22,12 +16,8 @@ export function ResultsState({
   videoData, 
   selectedFormat, 
   selectedQuality, 
-  watermarkOptions,
-  captionOptions,
   onFormatSelect, 
   onQualitySelect, 
-  onWatermarkChange,
-  onCaptionChange,
   onDownload 
 }: ResultsStateProps) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -206,16 +196,6 @@ export function ResultsState({
           </div>
         )}
 
-        {/* Watermark and Caption Controls */}
-        <div className="mb-6">
-          <WatermarkCaptionControls
-            watermark={watermarkOptions}
-            caption={captionOptions}
-            onWatermarkChange={onWatermarkChange}
-            onCaptionChange={onCaptionChange}
-          />
-        </div>
-
         {/* Download Button */}
         <div className="mb-4">
           <Button 
@@ -224,11 +204,6 @@ export function ResultsState({
           >
             <FAIcon icon="download" className="mr-2 text-xl" /> Download Now
           </Button>
-        </div>
-
-        {/* Social Share Controls */}
-        <div className="mb-4">
-          <SocialShareControls videoData={videoData} />
         </div>
         
         <p className="text-xs text-center text-slate-500 mt-3">

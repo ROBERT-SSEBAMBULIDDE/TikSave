@@ -48,16 +48,6 @@ export const downloadOptionsSchema = z.object({
   videoId: z.string(),
   format: z.enum(["mp4", "mp3", "webm"]),
   quality: z.enum(["high", "medium", "low"]),
-  watermark: z.object({
-    enabled: z.boolean(),
-    text: z.string().optional(),
-    position: z.enum(['top-left', 'top-right', 'bottom-left', 'bottom-right', 'center']).optional()
-  }).optional(),
-  caption: z.object({
-    enabled: z.boolean(),
-    text: z.string().optional(),
-    duration: z.number().optional()
-  }).optional()
 });
 
 // Define the downloads history table to track recent downloads

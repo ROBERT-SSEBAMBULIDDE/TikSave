@@ -8,9 +8,7 @@ import {
   DownloadFormat, 
   VideoQuality, 
   ToastData, 
-  DownloadOptions,
-  WatermarkOptions,
-  CaptionOptions
+  DownloadOptions 
 } from '@/lib/types';
 import { isValidTikTokUrl, getFileExtensionFromFormat } from '@/lib/utils';
 
@@ -22,16 +20,6 @@ export function useTikTokDownloader() {
   const [error, setError] = useState<ErrorData | null>(null);
   const [selectedFormat, setSelectedFormat] = useState<DownloadFormat>('mp4');
   const [selectedQuality, setSelectedQuality] = useState<VideoQuality>('high');
-  const [watermarkOptions, setWatermarkOptions] = useState<WatermarkOptions>({
-    enabled: false,
-    text: '',
-    position: 'bottom-right'
-  });
-  const [captionOptions, setCaptionOptions] = useState<CaptionOptions>({
-    enabled: false,
-    text: '',
-    duration: 5
-  });
   const [toast, setToast] = useState<ToastData>({ type: 'success', title: '', message: '', visible: false });
 
   // Handle URL input change
@@ -131,9 +119,7 @@ export function useTikTokDownloader() {
       const downloadOptions: DownloadOptions = {
         videoId: videoData.id,
         format: selectedFormat,
-        quality: selectedQuality,
-        watermark: watermarkOptions.enabled ? watermarkOptions : undefined,
-        caption: captionOptions.enabled ? captionOptions : undefined
+        quality: selectedQuality
       };
       
       // Set processing state to show progress
@@ -145,39 +131,7 @@ export function useTikTokDownloader() {
       
       // Create XHR request to track download progress
       const xhr = new XMLHttpRequest();
-      const urlParams = new URLSearchParams({
-        videoId: downloadOptions.videoId,
-        format: downloadOptions.format,
-        quality: downloadOptions.quality,
-        videoUrl: videoData.url,
-        thumbnailUrl: videoData.thumbnailUrl,
-        title: videoData.title,
-        author: videoData.author
-      });
-
-      // Add watermark parameters if enabled
-      if (downloadOptions.watermark?.enabled) {
-        urlParams.append('watermark', 'true');
-        if (downloadOptions.watermark.text) {
-          urlParams.append('watermarkText', downloadOptions.watermark.text);
-        }
-        if (downloadOptions.watermark.position) {
-          urlParams.append('watermarkPosition', downloadOptions.watermark.position);
-        }
-      }
-
-      // Add caption parameters if enabled
-      if (downloadOptions.caption?.enabled) {
-        urlParams.append('caption', 'true');
-        if (downloadOptions.caption.text) {
-          urlParams.append('captionText', downloadOptions.caption.text);
-        }
-        if (downloadOptions.caption.duration) {
-          urlParams.append('captionDuration', downloadOptions.caption.duration.toString());
-        }
-      }
-
-      const url = `/api/tiktok/download?${urlParams.toString()}`;
+      const url = `/api/tiktok/download?videoId=${downloadOptions.videoId}&format=${downloadOptions.format}&quality=${downloadOptions.quality}&videoUrl=${encodeURIComponent(videoData.url)}&thumbnailUrl=${encodeURIComponent(videoData.thumbnailUrl)}&title=${encodeURIComponent(videoData.title)}&author=${encodeURIComponent(videoData.author)}`;
       
       xhr.open('GET', url, true);
       xhr.responseType = 'blob';
@@ -338,16 +292,12 @@ export function useTikTokDownloader() {
     error,
     selectedFormat,
     selectedQuality,
-    watermarkOptions,
-    captionOptions,
     toast,
     handleUrlChange,
     processUrl,
     reset,
     handleFormatSelect,
     handleQualitySelect,
-    setWatermarkOptions,
-    setCaptionOptions,
     handleDownload,
     showToast
   };

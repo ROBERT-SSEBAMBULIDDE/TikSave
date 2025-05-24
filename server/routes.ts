@@ -63,26 +63,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Missing required video details" });
       }
       
-      // Extract watermark and caption options from query parameters
-      const watermarkOptions = req.query.watermark === 'true' ? {
-        enabled: true,
-        text: req.query.watermarkText as string,
-        position: req.query.watermarkPosition as string
-      } : undefined;
-
-      const captionOptions = req.query.caption === 'true' ? {
-        enabled: true,
-        text: req.query.captionText as string,
-        duration: req.query.captionDuration ? parseInt(req.query.captionDuration as string) : 5
-      } : undefined;
-
       // Process the video with the selected format and quality
       const { filePath, fileName, fileSize } = await processTikTokVideo(
         validatedData.videoId,
         validatedData.format,
-        validatedData.quality,
-        watermarkOptions,
-        captionOptions
+        validatedData.quality
       );
       
       // Check if file exists

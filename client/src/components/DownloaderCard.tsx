@@ -16,16 +16,12 @@ export function DownloaderCard() {
     error,
     selectedFormat,
     selectedQuality,
-    watermarkOptions,
-    captionOptions,
     toast,
     handleUrlChange,
     processUrl,
     reset,
     handleFormatSelect,
     handleQualitySelect,
-    setWatermarkOptions,
-    setCaptionOptions,
     handleDownload
   } = useTikTokDownloader();
 
@@ -101,12 +97,8 @@ export function DownloaderCard() {
               videoData={videoData}
               selectedFormat={selectedFormat}
               selectedQuality={selectedQuality}
-              watermarkOptions={watermarkOptions}
-              captionOptions={captionOptions}
               onFormatSelect={handleFormatSelect}
               onQualitySelect={handleQualitySelect}
-              onWatermarkChange={setWatermarkOptions}
-              onCaptionChange={setCaptionOptions}
               onDownload={handleDownload}
             />
           )}
