@@ -158,7 +158,7 @@ export function useYouTubeDownloaderComplete() {
           }
 
           // Get the actual download URL from the API response
-          const downloadUrl = result.downloadUrl || result.url || result.download_url || result.link || result.file || result.result;
+          const downloadUrl = result.downloadUrl || result.url || result.download_url || result.link;
           
           // Always prompt user to save video to device after processing
           const userWantsToSave = confirm(`✅ Your YouTube video is ready!\n\nTitle: ${videoData?.title || 'YouTube Video'}\nFormat: ${selectedFormat.toUpperCase()}\nQuality: ${selectedQuality}\n\nWould you like to save this video to your device?`);
@@ -173,8 +173,9 @@ export function useYouTubeDownloaderComplete() {
               link.click();
               document.body.removeChild(link);
             } else {
-              // If no direct download URL, show message and reset
-              alert(`✅ Video processed successfully!\n\nTitle: ${videoData?.title || 'YouTube Video'}\n\nThe video has been processed and saved to your recent downloads. You can access it from there.`);
+              // If no direct download URL, provide alternative download
+              const alternativeUrl = `https://www.y2mate.com/youtube/${videoData?.id}`;
+              window.open(alternativeUrl, '_blank');
             }
           }
 

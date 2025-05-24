@@ -26,7 +26,7 @@ interface YouTubeProgressResponse {
 const youtubeJobs = new Map<string, any>();
 
 export async function getYouTubeVideoInfo(url: string): Promise<VideoData> {
-  const rapidApiKey = process.env.YOUTUBE_RAPIDAPI_KEY;
+  const rapidApiKey = process.env.RAPIDAPI_KEY;
   
   if (!rapidApiKey) {
     throw new Error('YouTube service is not configured.');
@@ -40,7 +40,7 @@ export async function getYouTubeVideoInfo(url: string): Promise<VideoData> {
     }
 
     // Get authentic video information from YouTube API
-    const response = await fetch(`https://youtube-mp4-mp3-downloader.p.rapidapi.com/api/v1/download?format=720&id=${videoId}&audioQuality=128&addInfo=true`, {
+    const response = await fetch(`https://youtube-mp4-mp3-downloader.p.rapidapi.com/api/v1/info?id=${videoId}`, {
       method: 'GET',
       headers: {
         'X-RapidAPI-Key': rapidApiKey,
@@ -142,7 +142,7 @@ export async function processYouTubeVideo(
 }
 
 export async function getYouTubeProgress(jobId: string): Promise<YouTubeProgressResponse> {
-  const rapidApiKey = process.env.YOUTUBE_RAPIDAPI_KEY;
+  const rapidApiKey = process.env.RAPIDAPI_KEY;
   
   if (!rapidApiKey) {
     throw new Error('YouTube service not configured.');
@@ -167,7 +167,7 @@ export async function getYouTubeProgress(jobId: string): Promise<YouTubeProgress
       id: jobId,
       status: data.finished ? 'completed' : 'processing',
       progress: data.progress || 0,
-      downloadUrl: data.downloadUrl || data.url || data.download_url || data.link || data.file || data.result || undefined,
+      downloadUrl: data.downloadUrl || data.url || data.download_url || data.link || undefined,
       error: data.error || undefined
     };
     
