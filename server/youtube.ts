@@ -33,8 +33,7 @@ export async function getYouTubeVideoInfo(url: string): Promise<VideoData> {
       throw new Error('Invalid YouTube URL. Please check the URL and try again.');
     }
 
-    // For now, create basic video info from the URL
-    // This will be enhanced once we have the correct API endpoint
+    // Create video info using YouTube's thumbnail API and video ID
     const title = `YouTube Video ${videoId}`;
     const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
 
@@ -69,13 +68,55 @@ export async function processYouTubeVideo(
   }
 
   try {
-    // For now, we'll need the correct API endpoint from the documentation
-    // The user can provide the exact endpoint structure
-    throw new Error('YouTube download feature requires the correct API endpoint information. Please check the RapidAPI documentation for the exact download endpoint URL and parameters.');
+    // Map our format/quality to YouTube API format
+    let apiFormat = '720'; // Default to 720p
+    let audioQuality = '128';
+
+    if (format === 'mp3') {
+      apiFormat = 'mp3';
+      audioQuality = quality === 'high' ? '320' : quality === 'medium' ? '192' : '128';
+    } else {
+      // Video formats
+      apiFormat = quality === 'high' ? '1080' : quality === 'medium' ? '720' : '480';
+    }
+
+    // Start YouTube download using the correct API endpoint
+    const response = await fetch(`https://youtube-mp4-mp3-downloader.p.rapidapi.com/api/v1/download?format=${apiFormat}&id=${videoId}&audioQuality=${audioQuality}&addInfo=false`, {
+      method: 'GET',
+      headers: {
+        'X-RapidAPI-Key': rapidApiKey,
+        'X-RapidAPI-Host': 'youtube-mp4-mp3-downloader.p.rapidapi.com'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`YouTube download failed: ${response.status}`);
+    }
+
+    const result = await response.json();
     
+    if (!result.success) {
+      throw new Error('YouTube download request failed');
+    }
+
+    const jobId = result.progressId;
+
+    // Store job info for tracking
+    youtubeJobs.set(jobId, {
+      videoId,
+      url,
+      format,
+      quality,
+      title: result.title,
+      startTime: Date.now(),
+      status: 'processing'
+    });
+
+    return { jobId };
+
   } catch (error) {
     console.error('YouTube download error:', error);
-    throw new Error('YouTube download feature is being configured. Please try TikTok downloads for now.');
+    throw new Error('Failed to start YouTube download. Please try again.');
   }
 }
 
