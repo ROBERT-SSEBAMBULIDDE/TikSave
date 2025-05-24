@@ -345,6 +345,38 @@ export async function processTikTokVideo(
       '-threads', '4',  // Use parallel processing
       '-y'  // Overwrite output files without asking
     ];
+
+    // Add watermark if enabled
+    if (watermarkOptions?.enabled && watermarkOptions.text) {
+      const positions: Record<string, string> = {
+        'top-left': '10:10',
+        'top-right': 'W-tw-10:10',
+        'bottom-left': '10:H-th-10',
+        'bottom-right': 'W-tw-10:H-th-10',
+        'center': '(W-tw)/2:(H-th)/2'
+      };
+      
+      const position = positions[watermarkOptions.position || 'bottom-right'];
+      const watermarkFilter = `drawtext=text='${watermarkOptions.text}':fontcolor=white:fontsize=24:x=${position}:box=1:boxcolor=black@0.5:boxborderw=5`;
+      ffmpegArgs.push('-vf', watermarkFilter);
+    }
+
+    // Add captions if enabled
+    if (captionOptions?.enabled && captionOptions.text && format !== 'mp3') {
+      const duration = captionOptions.duration || 5;
+      const captionFilter = `drawtext=text='${captionOptions.text}':fontcolor=white:fontsize=20:x=(w-text_w)/2:y=h-th-20:enable='between(t,0,${duration})':box=1:boxcolor=black@0.7:boxborderw=5`;
+      
+      // If watermark is already applied, combine filters
+      if (watermarkOptions?.enabled && watermarkOptions.text) {
+        // Replace existing -vf with combined filter
+        const vfIndex = ffmpegArgs.findIndex(arg => arg === '-vf');
+        if (vfIndex !== -1) {
+          ffmpegArgs[vfIndex + 1] = `${ffmpegArgs[vfIndex + 1]},${captionFilter}`;
+        }
+      } else {
+        ffmpegArgs.push('-vf', captionFilter);
+      }
+    }
     
     // Add format-specific arguments
     if (format === 'mp3') {
