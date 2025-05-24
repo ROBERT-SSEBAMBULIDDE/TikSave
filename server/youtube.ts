@@ -39,8 +39,8 @@ export async function getYouTubeVideoInfo(url: string): Promise<VideoData> {
       throw new Error('Invalid YouTube URL. Please check the URL and try again.');
     }
 
-    // Get authentic video information from YouTube API
-    const response = await fetch(`https://youtube-mp4-mp3-downloader.p.rapidapi.com/api/v1/info?id=${videoId}`, {
+    // Get authentic video information from YouTube API - try alternative endpoint
+    const response = await fetch(`https://youtube-mp4-mp3-downloader.p.rapidapi.com/youtube?url=${encodeURIComponent(url)}`, {
       method: 'GET',
       headers: {
         'X-RapidAPI-Key': rapidApiKey,
@@ -54,17 +54,16 @@ export async function getYouTubeVideoInfo(url: string): Promise<VideoData> {
 
     const data = await response.json();
     
-    if (!data.success) {
-      throw new Error('Failed to get video information from YouTube');
-    }
-
+    // Handle different response structures
+    const videoInfo = data.data || data;
+    
     return {
       id: videoId,
       url: url,
-      title: data.title || `YouTube Video ${videoId}`,
-      author: data.channel || 'YouTube Channel',
-      thumbnailUrl: data.thumbnail || `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
-      duration: data.duration ? parseDuration(data.duration) : undefined
+      title: videoInfo.title || data.title || `YouTube Video ${videoId}`,
+      author: videoInfo.channel || data.channel || videoInfo.uploader || 'YouTube Channel',
+      thumbnailUrl: videoInfo.thumbnail || data.thumbnail || `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+      duration: videoInfo.duration ? parseDuration(videoInfo.duration) : undefined
     };
 
   } catch (error) {
@@ -101,13 +100,19 @@ export async function processYouTubeVideo(
       apiFormat = quality === 'high' ? '1080' : quality === 'medium' ? '720' : '480';
     }
 
-    // Start YouTube download using the correct API endpoint
-    const response = await fetch(`https://youtube-mp4-mp3-downloader.p.rapidapi.com/api/v1/download?format=${apiFormat}&id=${videoId}&audioQuality=${audioQuality}&addInfo=false`, {
-      method: 'GET',
+    // Start YouTube download using the YouTube MP4/MP3 Downloader API
+    const response = await fetch(`https://youtube-mp4-mp3-downloader.p.rapidapi.com/download`, {
+      method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         'X-RapidAPI-Key': rapidApiKey,
         'X-RapidAPI-Host': 'youtube-mp4-mp3-downloader.p.rapidapi.com'
-      }
+      },
+      body: JSON.stringify({
+        url: url,
+        format: format,
+        quality: quality
+      })
     });
 
     if (!response.ok) {
@@ -149,7 +154,7 @@ export async function getYouTubeProgress(jobId: string): Promise<YouTubeProgress
   }
 
   try {
-    const response = await fetch(`https://youtube-mp4-mp3-downloader.p.rapidapi.com/api/v1/progress?id=${jobId}`, {
+    const response = await fetch(`https://youtube-mp4-mp3-downloader.p.rapidapi.com/progress/${jobId}`, {
       headers: {
         'X-RapidAPI-Key': rapidApiKey,
         'X-RapidAPI-Host': 'youtube-mp4-mp3-downloader.p.rapidapi.com'
