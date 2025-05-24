@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { z } from "zod";
 import { tiktokUrlSchema, downloadOptionsSchema, insertDownloadHistorySchema } from "../shared/schema";
 import { getTikTokVideoInfo, processTikTokVideo } from "./tiktok";
+import { getYouTubeVideoInfo, processYouTubeVideo, getYouTubeProgress } from "./youtube";
 import path from "path";
 import fs from "fs";
 import { db } from "./db";

@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlatformSelector } from "./PlatformSelector";
 import { UniversalDownloaderForm } from "./UniversalDownloaderForm";
 import { useTikTokDownloader } from "@/hooks/use-tiktok-downloader";
-import { useYouTubeDownloader } from "@/hooks/use-youtube-downloader";
+// import { useYouTubeDownloader } from "@/hooks/use-youtube-downloader";
 import { ProcessingState } from "./ProcessingState";
 import { ResultsState } from "./ResultsState";
 import { ErrorState } from "./ErrorState";
@@ -14,10 +14,10 @@ export function UniversalDownloaderCard() {
   // TikTok downloader hook
   const tikTokDownloader = useTikTokDownloader();
   
-  // YouTube downloader hook (we'll create this)
+  // YouTube downloader hook (temporary placeholder)
   const youTubeDownloader = {
     url: "",
-    setUrl: () => {},
+    setUrl: (url: string) => {},
     selectedFormat: "mp4" as const,
     selectedQuality: "high" as const,
     handleFormatSelect: () => {},
