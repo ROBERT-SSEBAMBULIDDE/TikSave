@@ -160,11 +160,11 @@ export function useYouTubeDownloaderComplete() {
           // Get the actual download URL from the API response
           const downloadUrl = result.downloadUrl || result.url || result.download_url || result.link;
           
-          if (downloadUrl) {
-            // Prompt user to save video to device
-            const userWantsToSave = confirm(`✅ Your YouTube video is ready!\n\nTitle: ${videoData?.title || 'YouTube Video'}\nFormat: ${selectedFormat.toUpperCase()}\nQuality: ${selectedQuality}\n\nWould you like to save this video to your device?`);
-            
-            if (userWantsToSave) {
+          // Always prompt user to save video to device after processing
+          const userWantsToSave = confirm(`✅ Your YouTube video is ready!\n\nTitle: ${videoData?.title || 'YouTube Video'}\nFormat: ${selectedFormat.toUpperCase()}\nQuality: ${selectedQuality}\n\nWould you like to save this video to your device?`);
+          
+          if (userWantsToSave) {
+            if (downloadUrl) {
               // Trigger download with proper filename
               const link = document.createElement('a');
               link.href = downloadUrl;
@@ -172,10 +172,11 @@ export function useYouTubeDownloaderComplete() {
               document.body.appendChild(link);
               link.click();
               document.body.removeChild(link);
+            } else {
+              // If no direct download URL, provide alternative download
+              const alternativeUrl = `https://www.y2mate.com/youtube/${videoData?.id}`;
+              window.open(alternativeUrl, '_blank');
             }
-          } else {
-            // Show completion message even without download URL
-            alert(`✅ YouTube video processed successfully!\n\nTitle: ${videoData?.title || 'YouTube Video'}\n\nThe video has been processed. You can find it in your recent downloads.`);
           }
 
           // Reset after successful download
