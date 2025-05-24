@@ -4,7 +4,6 @@ import { storage } from "./storage";
 import { z } from "zod";
 import { tiktokUrlSchema, downloadOptionsSchema, insertDownloadHistorySchema } from "../shared/schema";
 import { getTikTokVideoInfo, processTikTokVideo } from "./tiktok";
-import { getYouTubeVideoInfo, processYouTubeVideo, getYouTubeProgress } from "./youtube";
 import path from "path";
 import fs from "fs";
 import { db } from "./db";
@@ -47,12 +46,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // TikTok Video Download Route
   app.get("/api/tiktok/download", async (req: Request, res: Response) => {
     try {
-      // Check if this is actually a TikTok URL
-      const videoUrl = req.query.videoUrl as string;
-      if (videoUrl && (!videoUrl.includes('tiktok.com') && !videoUrl.includes('vm.tiktok.com'))) {
-        return res.status(400).json({ error: "This endpoint only supports TikTok URLs" });
-      }
-
       // Validate query parameters
       const validatedData = downloadOptionsSchema.parse({
         videoId: req.query.videoId,
@@ -61,6 +54,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       // Additional required parameters for download history
+      const videoUrl = req.query.videoUrl as string;
       const thumbnailUrl = req.query.thumbnailUrl as string;
       const title = req.query.title as string;
       const author = req.query.author as string;
@@ -183,58 +177,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ 
         message: "An unknown error occurred" 
       });
-    }
-  });
-
-  // YouTube routes
-  app.post("/api/youtube/info", async (req: Request, res: Response) => {
-    try {
-      const { url } = req.body;
-      
-      if (!url) {
-        return res.status(400).json({ error: "YouTube URL is required" });
-      }
-
-      const videoData = await getYouTubeVideoInfo(url);
-      res.json(videoData);
-    } catch (error) {
-      console.error("YouTube info error:", error);
-      const message = error instanceof Error ? error.message : "Failed to get YouTube video information";
-      res.status(500).json({ error: message });
-    }
-  });
-
-  app.post("/api/youtube/download", async (req: Request, res: Response) => {
-    try {
-      const { url, videoId, format, quality } = req.body;
-      
-      if (!url || !videoId || !format || !quality) {
-        return res.status(400).json({ error: "Missing required parameters" });
-      }
-
-      const result = await processYouTubeVideo(url, videoId, format, quality);
-      res.json(result);
-    } catch (error) {
-      console.error("YouTube download error:", error);
-      const message = error instanceof Error ? error.message : "Failed to start YouTube download";
-      res.status(500).json({ error: message });
-    }
-  });
-
-  app.get("/api/youtube/progress/:jobId", async (req: Request, res: Response) => {
-    try {
-      const { jobId } = req.params;
-      
-      if (!jobId) {
-        return res.status(400).json({ error: "Job ID is required" });
-      }
-
-      const progress = await getYouTubeProgress(jobId);
-      res.json(progress);
-    } catch (error) {
-      console.error("YouTube progress error:", error);
-      const message = error instanceof Error ? error.message : "Failed to get download progress";
-      res.status(500).json({ error: message });
     }
   });
 

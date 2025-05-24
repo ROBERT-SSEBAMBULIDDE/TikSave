@@ -112,18 +112,9 @@ export function ResultsState({
                 </div>
               )}
               
-              {/* YouTube Video Embed for Preview */}
+              {/* Video Element */}
               {isPlaying && (
                 <>
-                  <iframe
-                    className="w-full h-full"
-                    src={`https://www.youtube.com/embed/${videoData.id}?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1`}
-                    title={videoData.title}
-                    frameBorder="0"
-                    allowFullScreen
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    onLoad={() => setVideoLoaded(true)}
-                  />
                   {!videoLoaded && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black">
                       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>

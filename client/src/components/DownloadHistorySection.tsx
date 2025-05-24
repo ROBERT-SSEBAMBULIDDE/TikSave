@@ -96,14 +96,6 @@ export function DownloadHistorySection() {
     window.open(downloadUrl, '_blank');
   };
 
-  const handleSaveToDevice = (download: DownloadRecord) => {
-    const userConfirmed = confirm(`💾 Save Video to Device\n\nTitle: ${download.title}\nFormat: ${download.format.toUpperCase()}\nQuality: ${download.quality}\n\nThis will re-download the video so you can save it to your device. Continue?`);
-    
-    if (userConfirmed) {
-      handleRedownload(download);
-    }
-  };
-
   if (loading) {
     return (
       <Card className="mt-6 w-full">
@@ -217,67 +209,14 @@ export function DownloadHistorySection() {
                   </div>
                 </div>
                 
-                <div className="flex gap-2 mt-3">
-                  <Button 
-                    variant="outline" 
-                    className="flex-1 text-xs py-1 h-8"
-                    onClick={() => {
-                      // Play video in app player - create in-app modal
-                      if (download.videoUrl.includes('youtube.com') || download.videoUrl.includes('youtu.be')) {
-                        // Create in-app video player modal
-                        const modal = document.createElement('div');
-                        modal.style.cssText = `
-                          position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-                          background: rgba(0,0,0,0.9); z-index: 10000; display: flex; 
-                          align-items: center; justify-content: center;
-                        `;
-                        
-                        const playerContainer = document.createElement('div');
-                        playerContainer.style.cssText = `
-                          width: 90%; max-width: 800px; height: 70%; background: #000; 
-                          border-radius: 8px; position: relative;
-                        `;
-                        
-                        const closeBtn = document.createElement('button');
-                        closeBtn.innerHTML = '✕';
-                        closeBtn.style.cssText = `
-                          position: absolute; top: -40px; right: 0; background: #fff; 
-                          border: none; width: 30px; height: 30px; border-radius: 50%; 
-                          cursor: pointer; font-size: 16px; z-index: 10001;
-                        `;
-                        closeBtn.onclick = () => document.body.removeChild(modal);
-                        
-                        const iframe = document.createElement('iframe');
-                        iframe.src = `https://www.youtube.com/embed/${download.videoId}?autoplay=1&controls=1&rel=0`;
-                        iframe.style.cssText = 'width: 100%; height: 100%; border: none; border-radius: 8px;';
-                        iframe.allowFullscreen = true;
-                        
-                        playerContainer.appendChild(closeBtn);
-                        playerContainer.appendChild(iframe);
-                        modal.appendChild(playerContainer);
-                        document.body.appendChild(modal);
-                        
-                        // Close on click outside
-                        modal.onclick = (e) => {
-                          if (e.target === modal) document.body.removeChild(modal);
-                        };
-                      } else {
-                        window.open(download.videoUrl, '_blank');
-                      }
-                    }}
-                    title="Play video in app"
-                  >
-                    ▶️ Play
-                  </Button>
-                  <Button 
-                    variant="default" 
-                    className="flex-1 text-xs py-1 h-8"
-                    onClick={() => handleSaveToDevice(download)}
-                    title="Save video to device"
-                  >
-                    💾 Save
-                  </Button>
-                </div>
+                <Button 
+                  variant="default" 
+                  className="w-full mt-3 text-xs sm:text-sm py-1 h-8"
+                  onClick={() => handleRedownload(download)}
+                >
+                  <ArrowDown size={14} className="mr-1 sm:mr-2" />
+                  Download Again
+                </Button>
               </div>
             </Card>
           ))}

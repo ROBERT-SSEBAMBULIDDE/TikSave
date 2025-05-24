@@ -1,7 +1,6 @@
 import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
 import { DownloaderCard } from "@/components/DownloaderCard";
-import { UniversalDownloaderCard } from "@/components/UniversalDownloaderCard";
 import { FAQSection } from "@/components/FAQSection";
 import { Footer } from "@/components/Footer";
 import { DownloadHistorySection } from "@/components/DownloadHistorySection";
@@ -15,7 +14,7 @@ export default function Home() {
       
       <main className="flex-grow">
         <HeroSection />
-        <UniversalDownloaderCard />
+        <DownloaderCard />
         <div className="container max-w-6xl px-4 py-8">
           {/* First Ad Unit - Fluid format for article-style ads */}
           <AdUnit format="fluid" className="md:px-4" />
