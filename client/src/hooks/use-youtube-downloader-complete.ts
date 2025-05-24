@@ -61,12 +61,8 @@ export function useYouTubeDownloaderComplete() {
       }
 
       setVideoData(result);
-      setProcessing({ progress: 100, message: "Video information loaded!" });
-      
-      // Transition to results state after a brief delay
-      setTimeout(() => {
-        setState("results");
-      }, 1000);
+      setState("results");  // Go directly to results for preview
+      setProcessing({ progress: 0, message: "" }); // Reset processing
 
     } catch (err) {
       console.error("YouTube info error:", err);

@@ -23,15 +23,18 @@ export function UniversalDownloaderCard() {
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newUrl = e.target.value;
     
-    // Auto-detect platform based on URL
+    // Auto-detect platform based on URL and update immediately
+    let detectedPlatform = selectedPlatform;
     if (newUrl.includes('tiktok.com') || newUrl.includes('vm.tiktok.com')) {
+      detectedPlatform = "tiktok";
       setSelectedPlatform("tiktok");
     } else if (newUrl.includes('youtube.com') || newUrl.includes('youtu.be')) {
+      detectedPlatform = "youtube";
       setSelectedPlatform("youtube");
     }
     
-    // Update the appropriate downloader based on current platform
-    if (selectedPlatform === "tiktok") {
+    // Update the appropriate downloader based on detected platform
+    if (detectedPlatform === "tiktok") {
       tikTokDownloader.handleUrlChange(e);
     } else {
       youTubeDownloader.setUrl(newUrl);
