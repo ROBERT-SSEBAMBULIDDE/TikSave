@@ -40,7 +40,7 @@ export async function getYouTubeVideoInfo(url: string): Promise<VideoData> {
     }
 
     // Get authentic video information from YouTube API
-    const response = await fetch(`https://youtube-mp4-mp3-downloader.p.rapidapi.com/info?id=${videoId}`, {
+    const response = await fetch(`https://youtube-mp4-mp3-downloader.p.rapidapi.com/api/v1/download?format=720&id=${videoId}&audioQuality=128&addInfo=true`, {
       method: 'GET',
       headers: {
         'X-RapidAPI-Key': rapidApiKey,
