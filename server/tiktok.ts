@@ -249,11 +249,14 @@ async function downloadTikTokVideo(url: string, videoId: string): Promise<string
 export async function processTikTokVideo(
   videoId: string, 
   format: DownloadFormat, 
-  quality: VideoQuality
+  quality: VideoQuality,
+  watermarkOptions?: { enabled: boolean; text?: string; position?: string },
+  captionOptions?: { enabled: boolean; text?: string; duration?: number }
 ): Promise<{ filePath: string, fileName: string, fileSize?: number }> {
   try {
-    // Check cache first to avoid reprocessing
-    const cachedVideo = getFromCache(videoId, format, quality);
+    // Check cache first to avoid reprocessing (only if no custom watermark/captions)
+    const hasCustomizations = (watermarkOptions?.enabled || captionOptions?.enabled);
+    const cachedVideo = hasCustomizations ? null : getFromCache(videoId, format, quality);
     if (cachedVideo) {
       console.log(`Cache hit: Using previously processed video for ${videoId} in ${format}/${quality} format`);
       
@@ -288,8 +291,9 @@ export async function processTikTokVideo(
     // Download the video without watermark
     const originalVideoPath = await downloadTikTokVideo(url, videoId);
     
-    // Define output path
-    const outputFilePath = path.join(TMP_DIR, `${videoId}_${format}_${quality}.${format}`);
+    // Define output path with customization suffix
+    const customSuffix = hasCustomizations ? `_custom_${Date.now()}` : '';
+    const outputFilePath = path.join(TMP_DIR, `${videoId}_${format}_${quality}${customSuffix}.${format}`);
     
     // Set quality parameters based on selected quality
     // Use faster presets across the board for better speed while maintaining quality

@@ -16,12 +16,16 @@ export function DownloaderCard() {
     error,
     selectedFormat,
     selectedQuality,
+    watermarkOptions,
+    captionOptions,
     toast,
     handleUrlChange,
     processUrl,
     reset,
     handleFormatSelect,
     handleQualitySelect,
+    setWatermarkOptions,
+    setCaptionOptions,
     handleDownload
   } = useTikTokDownloader();
 
