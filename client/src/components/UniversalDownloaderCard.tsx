@@ -46,7 +46,7 @@ export function UniversalDownloaderCard() {
     
     // Update the appropriate downloader
     if (selectedPlatform === "tiktok") {
-      tikTokDownloader.setUrl(newUrl);
+      tikTokDownloader.handleUrlChange(e);
     } else {
       youTubeDownloader.setUrl(newUrl);
     }
@@ -75,38 +75,38 @@ export function UniversalDownloaderCard() {
           {currentDownloader.state === "initial" && (
             <UniversalDownloaderForm
               platform={selectedPlatform}
-              url={currentDownloader.url}
+              url={selectedPlatform === "tiktok" ? tikTokDownloader.url : youTubeDownloader.url}
               onUrlChange={handleUrlChange}
-              onSubmit={currentDownloader.handleSubmit}
-              selectedFormat={currentDownloader.selectedFormat}
-              selectedQuality={currentDownloader.selectedQuality}
-              onFormatSelect={currentDownloader.handleFormatSelect}
-              onQualitySelect={currentDownloader.handleQualitySelect}
+              onSubmit={selectedPlatform === "tiktok" ? tikTokDownloader.processUrl : youTubeDownloader.handleSubmit}
+              selectedFormat={selectedPlatform === "tiktok" ? tikTokDownloader.selectedFormat : youTubeDownloader.selectedFormat}
+              selectedQuality={selectedPlatform === "tiktok" ? tikTokDownloader.selectedQuality : youTubeDownloader.selectedQuality}
+              onFormatSelect={selectedPlatform === "tiktok" ? tikTokDownloader.handleFormatSelect : youTubeDownloader.handleFormatSelect}
+              onQualitySelect={selectedPlatform === "tiktok" ? tikTokDownloader.handleQualitySelect : youTubeDownloader.handleQualitySelect}
             />
           )}
 
           {currentDownloader.state === "processing" && (
             <ProcessingState 
-              processing={currentDownloader.processing}
-              onReset={currentDownloader.handleReset}
+              processing={selectedPlatform === "tiktok" ? tikTokDownloader.processingStatus : currentDownloader.processing}
+              onReset={selectedPlatform === "tiktok" ? tikTokDownloader.handleReset : currentDownloader.handleReset}
             />
           )}
 
           {currentDownloader.state === "results" && currentDownloader.videoData && (
             <ResultsState
               videoData={currentDownloader.videoData}
-              selectedFormat={currentDownloader.selectedFormat}
-              selectedQuality={currentDownloader.selectedQuality}
-              onFormatSelect={currentDownloader.handleFormatSelect}
-              onQualitySelect={currentDownloader.handleQualitySelect}
-              onDownload={currentDownloader.handleDownload}
+              selectedFormat={selectedPlatform === "tiktok" ? tikTokDownloader.selectedFormat : currentDownloader.selectedFormat}
+              selectedQuality={selectedPlatform === "tiktok" ? tikTokDownloader.selectedQuality : currentDownloader.selectedQuality}
+              onFormatSelect={selectedPlatform === "tiktok" ? tikTokDownloader.handleFormatSelect : currentDownloader.handleFormatSelect}
+              onQualitySelect={selectedPlatform === "tiktok" ? tikTokDownloader.handleQualitySelect : currentDownloader.handleQualitySelect}
+              onDownload={selectedPlatform === "tiktok" ? tikTokDownloader.handleDownload : currentDownloader.handleDownload}
             />
           )}
 
           {currentDownloader.state === "error" && currentDownloader.error && (
             <ErrorState 
               error={currentDownloader.error}
-              onReset={currentDownloader.handleReset}
+              onReset={selectedPlatform === "tiktok" ? tikTokDownloader.handleReset : currentDownloader.handleReset}
             />
           )}
 
