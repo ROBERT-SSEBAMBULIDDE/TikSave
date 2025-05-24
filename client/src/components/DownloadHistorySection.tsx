@@ -96,6 +96,14 @@ export function DownloadHistorySection() {
     window.open(downloadUrl, '_blank');
   };
 
+  const handleSaveToDevice = (download: DownloadRecord) => {
+    const userConfirmed = confirm(`💾 Save Video to Device\n\nTitle: ${download.title}\nFormat: ${download.format.toUpperCase()}\nQuality: ${download.quality}\n\nThis will re-download the video so you can save it to your device. Continue?`);
+    
+    if (userConfirmed) {
+      handleRedownload(download);
+    }
+  };
+
   if (loading) {
     return (
       <Card className="mt-6 w-full">
@@ -213,16 +221,35 @@ export function DownloadHistorySection() {
                   <Button 
                     variant="outline" 
                     className="flex-1 text-xs py-1 h-8"
-                    onClick={() => window.open(download.videoUrl, '_blank')}
-                    title="Play video"
+                    onClick={() => {
+                      // Play video in app player for YouTube, open in new tab for TikTok
+                      if (download.videoUrl.includes('youtube.com') || download.videoUrl.includes('youtu.be')) {
+                        // Create modal or expand card to show YouTube embed
+                        const embedUrl = `https://www.youtube.com/embed/${download.videoId}?autoplay=1&controls=1&rel=0`;
+                        const playerWindow = window.open('', '_blank', 'width=800,height=600');
+                        if (playerWindow) {
+                          playerWindow.document.write(`
+                            <html>
+                              <head><title>${download.title}</title></head>
+                              <body style="margin:0;background:#000;">
+                                <iframe src="${embedUrl}" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
+                              </body>
+                            </html>
+                          `);
+                        }
+                      } else {
+                        window.open(download.videoUrl, '_blank');
+                      }
+                    }}
+                    title="Play video in app"
                   >
                     ▶️ Play
                   </Button>
                   <Button 
                     variant="default" 
                     className="flex-1 text-xs py-1 h-8"
-                    onClick={() => handleRedownload(download)}
-                    title="Save video again"
+                    onClick={() => handleSaveToDevice(download)}
+                    title="Save video to device"
                   >
                     💾 Save
                   </Button>
