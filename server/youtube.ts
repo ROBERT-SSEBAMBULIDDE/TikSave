@@ -26,12 +26,6 @@ interface YouTubeProgressResponse {
 const youtubeJobs = new Map<string, any>();
 
 export async function getYouTubeVideoInfo(url: string): Promise<VideoData> {
-  const rapidApiKey = process.env.RAPIDAPI_KEY;
-  
-  if (!rapidApiKey) {
-    throw new Error('YouTube download service is not configured. Please contact support.');
-  }
-
   try {
     // Extract video ID from YouTube URL
     const videoId = extractYouTubeVideoId(url);
@@ -39,35 +33,22 @@ export async function getYouTubeVideoInfo(url: string): Promise<VideoData> {
       throw new Error('Invalid YouTube URL. Please check the URL and try again.');
     }
 
-    // Call YouTube API to get video info
-    const response = await fetch(`https://youtube-mp4-mp3-downloader.p.rapidapi.com/api/v1/info?url=${encodeURIComponent(url)}`, {
-      method: 'GET',
-      headers: {
-        'X-RapidAPI-Key': rapidApiKey,
-        'X-RapidAPI-Host': 'youtube-mp4-mp3-downloader.p.rapidapi.com'
-      }
-    });
-
-    if (!response.ok) {
-      if (response.status === 401) {
-        throw new Error('YouTube service authentication failed. Please contact support.');
-      }
-      throw new Error(`YouTube service error: ${response.status}`);
-    }
-
-    const data: YouTubeAPIResponse = await response.json();
+    // For now, create basic video info from the URL
+    // This will be enhanced once we have the correct API endpoint
+    const title = `YouTube Video ${videoId}`;
+    const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
 
     return {
       id: videoId,
       url: url,
-      title: data.title || 'YouTube Video',
-      author: data.channel || 'Unknown Channel',
-      thumbnailUrl: data.thumbnail || '',
-      duration: parseDuration(data.duration)
+      title: title,
+      author: 'YouTube Channel',
+      thumbnailUrl: thumbnailUrl,
+      duration: undefined
     };
 
   } catch (error) {
-    console.error('YouTube API error:', error);
+    console.error('YouTube info error:', error);
     if (error instanceof Error) {
       throw error;
     }
@@ -88,43 +69,13 @@ export async function processYouTubeVideo(
   }
 
   try {
-    // Start download job
-    const response = await fetch(`https://youtube-mp4-mp3-downloader.p.rapidapi.com/api/v1/download`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-RapidAPI-Key': rapidApiKey,
-        'X-RapidAPI-Host': 'youtube-mp4-mp3-downloader.p.rapidapi.com'
-      },
-      body: JSON.stringify({
-        url: url,
-        format: format,
-        quality: quality
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`YouTube download failed: ${response.status}`);
-    }
-
-    const result = await response.json();
-    const jobId = result.id || result.jobId;
-
-    // Store job info for tracking
-    youtubeJobs.set(jobId, {
-      videoId,
-      url,
-      format,
-      quality,
-      startTime: Date.now(),
-      status: 'processing'
-    });
-
-    return { jobId };
-
+    // For now, we'll need the correct API endpoint from the documentation
+    // The user can provide the exact endpoint structure
+    throw new Error('YouTube download feature requires the correct API endpoint information. Please check the RapidAPI documentation for the exact download endpoint URL and parameters.');
+    
   } catch (error) {
     console.error('YouTube download error:', error);
-    throw new Error('Failed to start YouTube download. Please try again.');
+    throw new Error('YouTube download feature is being configured. Please try TikTok downloads for now.');
   }
 }
 
@@ -147,7 +98,16 @@ export async function getYouTubeProgress(jobId: string): Promise<YouTubeProgress
       throw new Error(`Progress check failed: ${response.status}`);
     }
 
-    const progress: YouTubeProgressResponse = await response.json();
+    const data = await response.json();
+    
+    // Convert the actual API response to our expected format
+    const progress: YouTubeProgressResponse = {
+      id: jobId,
+      status: data.finished ? 'completed' : 'processing',
+      progress: data.progress || 0,
+      downloadUrl: data.downloadUrl || undefined,
+      error: data.error || undefined
+    };
     
     // Update local job status
     const jobInfo = youtubeJobs.get(jobId);
