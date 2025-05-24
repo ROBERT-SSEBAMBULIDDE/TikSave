@@ -29,8 +29,22 @@ export interface ToastData {
   visible: boolean;
 }
 
+export interface WatermarkOptions {
+  enabled: boolean;
+  text?: string;
+  position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center';
+}
+
+export interface CaptionOptions {
+  enabled: boolean;
+  text?: string;
+  duration?: number;
+}
+
 export interface DownloadOptions {
   format: DownloadFormat;
   quality: VideoQuality;
   videoId: string;
+  watermark?: WatermarkOptions;
+  caption?: CaptionOptions;
 }

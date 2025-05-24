@@ -7,8 +7,12 @@ interface ResultsStateProps {
   videoData: VideoData;
   selectedFormat: DownloadFormat;
   selectedQuality: VideoQuality;
+  watermarkOptions: any;
+  captionOptions: any;
   onFormatSelect: (format: DownloadFormat) => void;
   onQualitySelect: (quality: VideoQuality) => void;
+  onWatermarkChange: (options: any) => void;
+  onCaptionChange: (options: any) => void;
   onDownload: () => Promise<void>;
 }
 
@@ -16,8 +20,12 @@ export function ResultsState({
   videoData, 
   selectedFormat, 
   selectedQuality, 
+  watermarkOptions,
+  captionOptions,
   onFormatSelect, 
   onQualitySelect, 
+  onWatermarkChange,
+  onCaptionChange,
   onDownload 
 }: ResultsStateProps) {
   const [isPlaying, setIsPlaying] = useState(false);
