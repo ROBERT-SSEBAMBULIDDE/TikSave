@@ -107,7 +107,3 @@
     "bufferutil": "^4.0.8"
   }
 }
-"scripts": {
-  "start": "node server/index.js",
-  "heroku-postbuild": "cd client && npm install && npm run build"
-}
