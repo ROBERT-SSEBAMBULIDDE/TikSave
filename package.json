@@ -108,6 +108,6 @@
   }
 }
 "scripts": {
-  "start": "NODE_ENV=production node dist/index.js",
-  "heroku-postbuild": "npm run build"
+  "start": "node server/index.js",
+  "heroku-postbuild": "cd client && npm install && npm run build"
 }
